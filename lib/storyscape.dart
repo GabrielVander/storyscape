@@ -1,12 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:storyscape/features/book_reading/presentation/pages/book_reader_page.dart';
 
 class Storyscape extends StatelessWidget {
-  const Storyscape({super.key});
+  Storyscape({super.key});
+
+  // GoRouter configuration
+  final _router = GoRouter(
+    routes: [
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const BookReaderPage(),
+      ),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: _router,
       title: 'Flutter Demo',
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+        useMaterial3: true,
+      ),
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -26,7 +43,6 @@ class Storyscape extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
