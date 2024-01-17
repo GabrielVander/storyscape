@@ -6,11 +6,11 @@ class Storyscape extends StatelessWidget {
   Storyscape({super.key});
 
   // GoRouter configuration
-  final _router = GoRouter(
-    routes: [
+  final GoRouter _router = GoRouter(
+    routes: <RouteBase>[
       GoRoute(
         path: '/',
-        builder: (context, state) => const BookReaderPage(),
+        builder: (BuildContext context, GoRouterState state) => const BookReaderPage(),
       ),
     ],
   );

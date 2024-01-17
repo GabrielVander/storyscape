@@ -1,4 +1,5 @@
 import 'package:epub_view/epub_view.dart';
+import 'package:epub_view/src/data/models/chapter_view_value.dart' show EpubChapterViewValue;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:internet_file/internet_file.dart';
@@ -11,11 +12,11 @@ class BookReaderPage extends HookWidget {
     final controller = useState<EpubController?>(null);
     useEffect(
       () {
-        buildController().then((value) => controller.value = value);
+        buildController().then((EpubController value) => controller.value = value);
 
         return null;
       },
-      [],
+      <Object?>[],
     );
 
     if (controller.value == null) {
@@ -33,7 +34,7 @@ class BookReaderPage extends HookWidget {
       appBar: AppBar(
         title: EpubViewActualChapter(
           controller: controller.value!,
-          builder: (chapterValue) => Text(
+          builder: (EpubChapterViewValue? chapterValue) => Text(
             chapterValue?.chapter?.Title?.replaceAll('\n', '').trim() ?? '',
             textAlign: TextAlign.start,
           ),

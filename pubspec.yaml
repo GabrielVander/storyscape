@@ -50,9 +50,11 @@ dependencies:
   internet_file: ^1.2.0
 
 dev_dependencies:
+  bloc_test: ^9.1.5
   flutter_test:
     sdk: flutter
 
+  mocktail: ^1.0.2
   very_good_analysis: ^5.1.0
 
 # For information on the generic Dart part of this file, see the

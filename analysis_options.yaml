@@ -26,6 +26,9 @@ linter:
     # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
     public_member_api_docs: false
     sort_pub_dependencies: false
+    lines_longer_than_80_chars: false
+    omit_local_variable_types: false
+    prefer_final_locals: true
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
