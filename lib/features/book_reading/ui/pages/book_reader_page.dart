@@ -4,7 +4,7 @@ import 'package:epub_view/src/data/models/chapter_view_value.dart' show EpubChap
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooked_bloc/hooked_bloc.dart';
-import 'package:storyscape/features/book_reading/presentation/cubit/book_reader_cubit.dart';
+import 'package:storyscape/features/book_reading/ui/cubit/book_reader_cubit.dart';
 
 class BookReaderPage extends HookWidget {
   const BookReaderPage({required this.bookReaderCubit, super.key});

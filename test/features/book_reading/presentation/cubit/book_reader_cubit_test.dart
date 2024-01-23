@@ -1,7 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:storyscape/features/book_reading/presentation/cubit/book_reader_cubit.dart';
+import 'package:storyscape/features/book_reading/ui/cubit/book_reader_cubit.dart';
 
 Future<Uint8List> dummyNetworkFileRetriever(String link, void Function(double) p) async =>
     Uint8List.fromList(List.empty());

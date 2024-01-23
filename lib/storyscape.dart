@@ -2,8 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internet_file/internet_file.dart';
-import 'package:storyscape/features/book_reading/presentation/cubit/book_reader_cubit.dart';
-import 'package:storyscape/features/book_reading/presentation/pages/book_reader_page.dart';
+import 'package:storyscape/features/book_reading/ui/cubit/book_reader_cubit.dart';
+import 'package:storyscape/features/book_reading/ui/pages/book_reader_page.dart';
 
 class Storyscape extends StatelessWidget {
   Storyscape({super.key});
