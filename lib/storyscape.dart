@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:internet_file/internet_file.dart';
+import 'package:storyscape/features/book_reading/presentation/cubit/book_reader_cubit.dart';
 import 'package:storyscape/features/book_reading/presentation/pages/book_reader_page.dart';
 
 class Storyscape extends StatelessWidget {
@@ -10,7 +12,14 @@ class Storyscape extends StatelessWidget {
     routes: <RouteBase>[
       GoRoute(
         path: '/',
-        builder: (BuildContext context, GoRouterState state) => const BookReaderPage(),
+        builder: (BuildContext context, GoRouterState state) => BookReaderPage(
+          bookReaderCubit: BookReaderCubit(
+            networkFileRetriever: (String url, void Function(double) progressUpdater) async => InternetFile.get(
+              url,
+              progress: (receivedLength, contentLength) => progressUpdater(receivedLength / contentLength * 100),
+            ),
+          ),
+        ),
       ),
     ],
   );

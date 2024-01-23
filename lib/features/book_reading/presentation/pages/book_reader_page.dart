@@ -2,90 +2,129 @@ import 'package:epub_view/epub_view.dart';
 import 'package:epub_view/src/data/models/chapter_view_value.dart' show EpubChapterViewValue;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:internet_file/internet_file.dart';
+import 'package:hooked_bloc/hooked_bloc.dart';
+import 'package:storyscape/features/book_reading/presentation/cubit/book_reader_cubit.dart';
 
 class BookReaderPage extends HookWidget {
-  const BookReaderPage({super.key});
+  const BookReaderPage({required this.bookReaderCubit, super.key});
+
+  final BookReaderCubit bookReaderCubit;
 
   @override
   Widget build(BuildContext context) {
-    final controller = useState<EpubController?>(null);
     useEffect(
       () {
-        buildController().then((EpubController value) => controller.value = value);
+        bookReaderCubit.download('https://www.gutenberg.org/cache/epub/72732/pg72732-images-3.epub');
 
         return null;
       },
-      <Object?>[],
+      [],
     );
 
-    if (controller.value == null) {
+    final BookReaderState bookReaderState = useBlocBuilder(bookReaderCubit);
+
+    if ([BookReaderInitial, BookReaderLoading, BookReaderDownloading].contains(bookReaderState.runtimeType)) {
+      final String title = bookReaderState is BookReaderDownloading ? 'Downloading...' : 'Loading...';
+
+      final Widget content = bookReaderState is BookReaderDownloading
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    value: bookReaderState.percentageValue,
+                  ),
+                  Text(bookReaderState.percentageDisplay),
+                ],
+              ),
+            )
+          : const Center(child: CircularProgressIndicator());
+
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Loading..'),
+          title: Text(title),
         ),
-        body: const Center(
-          child: CircularProgressIndicator(),
+        body: Center(
+          child: content,
+        ),
+      );
+    }
+
+    if (bookReaderState is BookReaderError) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Error'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Something went wrong!'),
+              Text(bookReaderState.context),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (bookReaderState is BookReaderFinished) {
+      final EpubController epubController = EpubController(
+        document: EpubDocument.openData(bookReaderState.content),
+      );
+
+      return Scaffold(
+        appBar: AppBar(
+          title: EpubViewActualChapter(
+            controller: epubController,
+            builder: (EpubChapterViewValue? chapterValue) => Text(
+              chapterValue?.chapter?.Title?.replaceAll('\n', '').trim() ?? '',
+              textAlign: TextAlign.start,
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.save_alt),
+              color: Colors.white,
+              onPressed: () => (BuildContext context) {
+                final String? cfi = epubController.generateEpubCfi();
+
+                if (cfi != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(cfi),
+                      action: SnackBarAction(
+                        label: 'GO',
+                        onPressed: () {
+                          epubController.gotoEpubCfi(cfi);
+                        },
+                      ),
+                    ),
+                  );
+                }
+              }(context),
+            ),
+          ],
+        ),
+        drawer: Drawer(
+          child: EpubViewTableOfContents(controller: epubController),
+        ),
+        body: EpubView(
+          builders: EpubViewBuilders<DefaultBuilderOptions>(
+            options: const DefaultBuilderOptions(),
+            chapterDividerBuilder: (_) => const Divider(),
+          ),
+          controller: epubController,
         ),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: EpubViewActualChapter(
-          controller: controller.value!,
-          builder: (EpubChapterViewValue? chapterValue) => Text(
-            chapterValue?.chapter?.Title?.replaceAll('\n', '').trim() ?? '',
-            textAlign: TextAlign.start,
-          ),
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.save_alt),
-            color: Colors.white,
-            onPressed: () => (BuildContext context) {
-              final cfi = controller.value?.generateEpubCfi();
-
-              if (cfi != null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(cfi),
-                    action: SnackBarAction(
-                      label: 'GO',
-                      onPressed: () {
-                        controller.value?.gotoEpubCfi(cfi);
-                      },
-                    ),
-                  ),
-                );
-              }
-            }(context),
-          ),
-        ],
+        title: const Text('Error'),
       ),
-      drawer: Drawer(
-        child: EpubViewTableOfContents(controller: controller.value!),
+      body: Center(
+        child: Text('Invalid state: $bookReaderState'),
       ),
-      body: EpubView(
-        builders: EpubViewBuilders<DefaultBuilderOptions>(
-          options: const DefaultBuilderOptions(),
-          chapterDividerBuilder: (_) => const Divider(),
-        ),
-        controller: controller.value!,
-      ),
-    );
-  }
-
-  Future<EpubController> buildController() async {
-    final bytes = await InternetFile.get('https://www.gutenberg.org/cache/epub/72732/pg72732-images-3.epub');
-
-    return EpubController(
-      document:
-          // EpubDocument.openAsset('assets/New-Findings-on-Shirdi-Sai-Baba.epub'),
-          EpubDocument.openData(bytes), // epubCfi:
-      //     'epubcfi(/6/26[id4]!/4/2/2[id4]/22)', // book.epub Chapter 3 paragraph 10
-      // epubCfi:
-      //     'epubcfi(/6/6[chapter-2]!/4/2/1612)', // book_2.epub Chapter 16 paragraph 3
     );
   }
 }
