@@ -1,12 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:internet_file/internet_file.dart';
+import 'package:storyscape/features/book_reading/presentation/cubit/book_reader_cubit.dart';
+import 'package:storyscape/features/book_reading/presentation/pages/book_reader_page.dart';
 
 class Storyscape extends StatelessWidget {
-  const Storyscape({super.key});
+  Storyscape({super.key});
+
+  // GoRouter configuration
+  final GoRouter _router = GoRouter(
+    routes: <RouteBase>[
+      GoRoute(
+        path: '/',
+        builder: (BuildContext context, GoRouterState state) => BookReaderPage(
+          bookReaderCubit: BookReaderCubit(
+            networkFileRetriever: (String url, void Function(double) progressUpdater) async => InternetFile.get(
+              url,
+              progress: (receivedLength, contentLength) => progressUpdater(receivedLength / contentLength * 100),
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: _router,
       title: 'Flutter Demo',
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+        useMaterial3: true,
+      ),
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -26,7 +52,6 @@ class Storyscape extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }

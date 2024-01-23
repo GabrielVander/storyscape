@@ -1,0 +1,130 @@
+import 'package:epub_view/epub_view.dart';
+import 'package:epub_view/src/data/models/chapter_view_value.dart' show EpubChapterViewValue;
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooked_bloc/hooked_bloc.dart';
+import 'package:storyscape/features/book_reading/presentation/cubit/book_reader_cubit.dart';
+
+class BookReaderPage extends HookWidget {
+  const BookReaderPage({required this.bookReaderCubit, super.key});
+
+  final BookReaderCubit bookReaderCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    useEffect(
+      () {
+        bookReaderCubit.download('https://www.gutenberg.org/cache/epub/72732/pg72732-images-3.epub');
+
+        return null;
+      },
+      [],
+    );
+
+    final BookReaderState bookReaderState = useBlocBuilder(bookReaderCubit);
+
+    if ([BookReaderInitial, BookReaderLoading, BookReaderDownloading].contains(bookReaderState.runtimeType)) {
+      final String title = bookReaderState is BookReaderDownloading ? 'Downloading...' : 'Loading...';
+
+      final Widget content = bookReaderState is BookReaderDownloading
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    value: bookReaderState.percentageValue,
+                  ),
+                  Text(bookReaderState.percentageDisplay),
+                ],
+              ),
+            )
+          : const Center(child: CircularProgressIndicator());
+
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(title),
+        ),
+        body: Center(
+          child: content,
+        ),
+      );
+    }
+
+    if (bookReaderState is BookReaderError) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Error'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Something went wrong!'),
+              Text(bookReaderState.context),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (bookReaderState is BookReaderFinished) {
+      final EpubController epubController = EpubController(
+        document: EpubDocument.openData(bookReaderState.content),
+      );
+
+      return Scaffold(
+        appBar: AppBar(
+          title: EpubViewActualChapter(
+            controller: epubController,
+            builder: (EpubChapterViewValue? chapterValue) => Text(
+              chapterValue?.chapter?.Title?.replaceAll('\n', '').trim() ?? '',
+              textAlign: TextAlign.start,
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.save_alt),
+              color: Colors.white,
+              onPressed: () => (BuildContext context) {
+                final String? cfi = epubController.generateEpubCfi();
+
+                if (cfi != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(cfi),
+                      action: SnackBarAction(
+                        label: 'GO',
+                        onPressed: () {
+                          epubController.gotoEpubCfi(cfi);
+                        },
+                      ),
+                    ),
+                  );
+                }
+              }(context),
+            ),
+          ],
+        ),
+        drawer: Drawer(
+          child: EpubViewTableOfContents(controller: epubController),
+        ),
+        body: EpubView(
+          builders: EpubViewBuilders<DefaultBuilderOptions>(
+            options: const DefaultBuilderOptions(),
+            chapterDividerBuilder: (_) => const Divider(),
+          ),
+          controller: epubController,
+        ),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Error'),
+      ),
+      body: Center(
+        child: Text('Invalid state: $bookReaderState'),
+      ),
+    );
+  }
+}
