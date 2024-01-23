@@ -1,0 +1,10 @@
+{
+  "bookReading": {
+    "downloadingLabel": "Baixando...",
+    "loadingLabel": "Carregando...",
+    "errorLabel": "Erro",
+    "error": {
+      "genericErrorMessage": "Algo deu errado"
+    }
+  }
+}
