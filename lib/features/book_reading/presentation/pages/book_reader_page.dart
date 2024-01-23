@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:epub_view/epub_view.dart';
 import 'package:epub_view/src/data/models/chapter_view_value.dart' show EpubChapterViewValue;
 import 'package:flutter/material.dart';
@@ -24,7 +25,9 @@ class BookReaderPage extends HookWidget {
     final BookReaderState bookReaderState = useBlocBuilder(bookReaderCubit);
 
     if ([BookReaderInitial, BookReaderLoading, BookReaderDownloading].contains(bookReaderState.runtimeType)) {
-      final String title = bookReaderState is BookReaderDownloading ? 'Downloading...' : 'Loading...';
+      final String title = bookReaderState is BookReaderDownloading
+          ? 'bookReading.downloadingLabel'.tr()
+          : 'bookReading.loadingLabel'.tr();
 
       final Widget content = bookReaderState is BookReaderDownloading
           ? Center(
@@ -53,13 +56,13 @@ class BookReaderPage extends HookWidget {
     if (bookReaderState is BookReaderError) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Error'),
+          title: const Text('bookReading.errorLabel').tr(),
         ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('Something went wrong!'),
+              Text('bookReading.error.${bookReaderState.errorCode}').tr(),
               Text(bookReaderState.context),
             ],
           ),
