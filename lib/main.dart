@@ -8,7 +8,7 @@ Future<void> main() async {
 
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale('en')],
+      supportedLocales: const [Locale('en'), Locale('pt', 'BR')],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
       child: Storyscape(),
