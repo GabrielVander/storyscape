@@ -1,28 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:internet_file/internet_file.dart';
-import 'package:storyscape/features/book_reading/ui/cubit/book_reader_cubit.dart';
-import 'package:storyscape/features/book_reading/ui/pages/book_reader_page.dart';
+import 'package:storyscape/core/routing/routes.dart';
 
 class Storyscape extends StatelessWidget {
   Storyscape({super.key});
 
-  // GoRouter configuration
   final GoRouter _router = GoRouter(
-    routes: <RouteBase>[
-      GoRoute(
-        path: '/',
-        builder: (BuildContext context, GoRouterState state) => BookReaderPage(
-          bookReaderCubit: BookReaderCubit(
-            networkFileRetriever: (String url, void Function(double) progressUpdater) async => InternetFile.get(
-              url,
-              progress: (receivedLength, contentLength) => progressUpdater(receivedLength / contentLength * 100),
-            ),
-          ),
-        ),
-      ),
-    ],
+    initialLocation: const BookSelectionRoute().location,
+    debugLogDiagnostics: true,
+    routes: $appRoutes,
   );
 
   @override
@@ -33,10 +20,7 @@ class Storyscape extends StatelessWidget {
       supportedLocales: context.supportedLocales,
       locale: context.locale,
       title: 'Storyscape',
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
-        useMaterial3: true,
-      ),
+      darkTheme: ThemeData.dark(useMaterial3: true),
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
