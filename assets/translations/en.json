@@ -6,5 +6,9 @@
     "error": {
       "genericErrorMessage": "Something went wrong"
     }
+  },
+  "bookSelection": {
+    "pageTitle": "Open book",
+    "urlFieldLabel": "Book URL"
   }
 }

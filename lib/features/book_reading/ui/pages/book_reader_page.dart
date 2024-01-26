@@ -7,15 +7,16 @@ import 'package:hooked_bloc/hooked_bloc.dart';
 import 'package:storyscape/features/book_reading/ui/cubit/book_reader_cubit.dart';
 
 class BookReaderPage extends HookWidget {
-  const BookReaderPage({required this.bookReaderCubit, super.key});
+  const BookReaderPage({required this.url, required this.bookReaderCubit, super.key});
 
+  final String url;
   final BookReaderCubit bookReaderCubit;
 
   @override
   Widget build(BuildContext context) {
     useEffect(
       () {
-        bookReaderCubit.download('https://www.gutenberg.org/cache/epub/72732/pg72732-images-3.epub');
+        bookReaderCubit.download(url);
 
         return null;
       },
