@@ -401,10 +401,10 @@ packages:
     dependency: "direct main"
     description:
       name: hooked_bloc
-      sha256: e03477f73643f54b077791dee9c14879bb0702801164df90522837a2f2bdffaa
+      sha256: "794d11a180bac06c53996aa4bc59018072de3cc5311c19f71151a473b5fe40e4"
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.4"
+    version: "1.5.0"
   html:
     dependency: transitive
     description:
