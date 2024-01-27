@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:epub_view/epub_view.dart';
+// ignore: implementation_imports
 import 'package:epub_view/src/data/models/chapter_view_value.dart' show EpubChapterViewValue;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
