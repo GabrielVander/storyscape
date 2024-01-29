@@ -886,10 +886,10 @@ packages:
     dependency: "direct main"
     description:
       name: tapper
-      sha256: e5bc350702df071e8025e807c1034b2abeffd87001d9cc215811e925bbaac6ed
+      sha256: "238c3379f006a0d391b0173f713be76921971484ab4aeafd7d56aac32f7d0215"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.6"
+    version: "0.1.7"
   term_glyph:
     dependency: transitive
     description:
