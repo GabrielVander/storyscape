@@ -1,17 +1,17 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:isar/isar.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rust_core/src/result/result.dart';
-import 'package:storyscape/core/library_wrappers/isar_database/isar_database_wrapper.dart';
 import 'package:storyscape/features/book_storage/data.data_sources.local/book_isar_data_source.dart';
 import 'package:storyscape/features/book_storage/data.data_sources.local/models/local_book_isar_model.dart';
 
 void main() {
-  late IsarDatabaseInstance isarDb;
+  late Isar isar;
   late BookIsarDataSourceImpl dataSource;
 
   setUp(() {
-    isarDb = _MockIsarDatabaseInstance();
-    dataSource = BookIsarDataSourceImpl(isarDatabase: isarDb);
+    isar = _MockIsar();
+    dataSource = BookIsarDataSourceImpl(isar: isar);
 
     registerFallbackValue(_MockLocalBookIsarModel());
   });
@@ -19,7 +19,7 @@ void main() {
   tearDown(resetMocktailState);
 
   test('should return Err if unable to retrieve Isar collection when upserting a book', () async {
-    when(() => isarDb.getCollection<LocalBookIsarModel>()).thenThrow(Exception('WZ3iDO1J'));
+    when(() => isar.collection<LocalBookIsarModel>()).thenThrow(Exception('WZ3iDO1J'));
 
     final Result<int, String> result = await dataSource.upsertBook(const LocalBookIsarModel(id: null, url: '7tTeH1zc'));
 
@@ -29,7 +29,7 @@ void main() {
   test('should return Err if operation fails when upserting a book', () async {
     final IsarCollection<LocalBookIsarModel> collection = _MockLocalBookIsarCollection();
 
-    when(() => isarDb.getCollection<LocalBookIsarModel>()).thenReturn(collection);
+    when(() => isar.collection<LocalBookIsarModel>()).thenReturn(collection);
     when(() => collection.put(any())).thenThrow(Exception('qjrKpB6RLk'));
 
     final Result<int, String> result = await dataSource.upsertBook(const LocalBookIsarModel(id: null, url: 'xdtzk7YW'));
@@ -40,7 +40,7 @@ void main() {
   test('should return Ok if operation succeeds when upserting a book', () async {
     final IsarCollection<LocalBookIsarModel> collection = _MockLocalBookIsarCollection();
 
-    when(() => isarDb.getCollection<LocalBookIsarModel>()).thenReturn(collection);
+    when(() => isar.collection<LocalBookIsarModel>()).thenReturn(collection);
     when(() => collection.put(any())).thenAnswer((_) async => 648);
 
     final Result<int, String> result = await dataSource.upsertBook(const LocalBookIsarModel(id: null, url: 'xdtzk7YW'));
@@ -49,7 +49,7 @@ void main() {
   });
 }
 
-class _MockIsarDatabaseInstance extends Mock implements IsarDatabaseInstance {}
+class _MockIsar extends Mock implements Isar {}
 
 class _MockLocalBookIsarCollection extends Mock implements IsarCollection<LocalBookIsarModel> {}
 
