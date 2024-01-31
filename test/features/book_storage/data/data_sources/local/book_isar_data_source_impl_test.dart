@@ -2,8 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:isar/isar.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rust_core/src/result/result.dart';
-import 'package:storyscape/features/book_storage/data.data_sources.local/book_isar_data_source.dart';
-import 'package:storyscape/features/book_storage/data.data_sources.local/models/local_book_isar_model.dart';
+import 'package:storyscape/features/book_storage/data/data_sources/local/book_isar_data_source.dart';
+import 'package:storyscape/features/book_storage/data/data_sources/local/models/local_book_isar_model.dart';
 
 void main() {
   late Isar isar;

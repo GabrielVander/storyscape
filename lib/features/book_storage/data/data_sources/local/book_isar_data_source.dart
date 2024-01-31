@@ -4,7 +4,7 @@ import 'package:isar/isar.dart';
 import 'package:rust_core/result.dart';
 import 'package:storyscape/core/logging/storyscape_logger.dart';
 import 'package:storyscape/core/logging/storyscape_logger_factory.dart';
-import 'package:storyscape/features/book_storage/data.data_sources.local/models/local_book_isar_model.dart';
+import 'package:storyscape/features/book_storage/data/data_sources/local/models/local_book_isar_model.dart';
 
 abstract interface class BookIsarDataSource {
   Future<Result<int, String>> upsertBook(LocalBookIsarModel model);
