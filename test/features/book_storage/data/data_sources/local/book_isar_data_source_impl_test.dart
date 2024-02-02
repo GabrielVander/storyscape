@@ -9,48 +9,37 @@ void main() {
   late Isar isar;
   late BookIsarDataSourceImpl dataSource;
 
+  setUpAll(() async {
+    await Isar.initializeIsarCore(download: true);
+    isar = await Isar.open(
+      [LocalBookIsarModelSchema],
+      directory: 'test/features/book_storage/data/data_sources/local/isar_db',
+    );
+
+    await isar.writeTxn(() async {
+      await isar.localBookIsarModels.clear();
+    });
+  });
+
+  tearDownAll(() {
+    isar.close(deleteFromDisk: true);
+  });
+
   setUp(() {
-    isar = _MockIsar();
     dataSource = BookIsarDataSourceImpl(isar: isar);
-
-    registerFallbackValue(_MockLocalBookIsarModel());
   });
 
-  tearDown(resetMocktailState);
+  tearDown(() async {
+    resetMocktailState();
 
-  test('should return Err if unable to retrieve Isar collection when upserting a book', () async {
-    when(() => isar.collection<LocalBookIsarModel>()).thenThrow(Exception('WZ3iDO1J'));
-
-    final Result<int, String> result = await dataSource.upsertBook(const LocalBookIsarModel(id: null, url: '7tTeH1zc'));
-
-    expect(result, const Err<dynamic, String>('Unable to perform upsert operation'));
-  });
-
-  test('should return Err if operation fails when upserting a book', () async {
-    final IsarCollection<LocalBookIsarModel> collection = _MockLocalBookIsarCollection();
-
-    when(() => isar.collection<LocalBookIsarModel>()).thenReturn(collection);
-    when(() => collection.put(any())).thenThrow(Exception('qjrKpB6RLk'));
-
-    final Result<int, String> result = await dataSource.upsertBook(const LocalBookIsarModel(id: null, url: 'xdtzk7YW'));
-
-    expect(result, const Err<dynamic, String>('Unable to perform upsert operation'));
+    await isar.writeTxn(() async {
+      await isar.localBookIsarModels.clear();
+    });
   });
 
   test('should return Ok if operation succeeds when upserting a book', () async {
-    final IsarCollection<LocalBookIsarModel> collection = _MockLocalBookIsarCollection();
-
-    when(() => isar.collection<LocalBookIsarModel>()).thenReturn(collection);
-    when(() => collection.put(any())).thenAnswer((_) async => 648);
-
     final Result<int, String> result = await dataSource.upsertBook(const LocalBookIsarModel(id: null, url: 'xdtzk7YW'));
 
-    expect(result, const Ok(648));
+    expect(result, const Ok(1));
   });
 }
-
-class _MockIsar extends Mock implements Isar {}
-
-class _MockLocalBookIsarCollection extends Mock implements IsarCollection<LocalBookIsarModel> {}
-
-class _MockLocalBookIsarModel extends Mock implements LocalBookIsarModel {}

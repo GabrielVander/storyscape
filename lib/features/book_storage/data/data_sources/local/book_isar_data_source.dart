@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:isar/isar.dart';
 import 'package:rust_core/result.dart';
+import 'package:rust_core/typedefs.dart';
 import 'package:storyscape/core/logging/storyscape_logger.dart';
 import 'package:storyscape/core/logging/storyscape_logger_factory.dart';
 import 'package:storyscape/features/book_storage/data/data_sources/local/models/local_book_isar_model.dart';
@@ -20,16 +21,12 @@ class BookIsarDataSourceImpl implements BookIsarDataSource {
   Future<Result<int, String>> upsertBook(LocalBookIsarModel model) async {
     _logger.debug('Upserting local book...');
 
-    return putBookInCollection(model).mapErr((error) => 'Unable to perform upsert operation');
+    return _putBookInCollection(model).inspect((ok) => _logger.debug('Book upserted correctly'));
   }
 
-  Future<Result<int, Exception>> putBookInCollection(LocalBookIsarModel model) async {
-    try {
-      return Ok(await _isar.collection<LocalBookIsarModel>().put(model));
-    } on Exception catch (e, stack) {
-      _logger.error('Unable to perform upsert operation', error: e, stackTrace: stack);
+  Future<Result<Id, Infallible>> _putBookInCollection(LocalBookIsarModel model) async =>
+      Future.value(Ok<LocalBookIsarModel, Infallible>(model)).andThen(_putBookOnIsarLocalBookCollection);
 
-      return Err(e);
-    }
-  }
+  Future<Result<Id, Infallible>> _putBookOnIsarLocalBookCollection(LocalBookIsarModel book) async =>
+      Ok(await _isar.writeTxn(() async => _isar.collection<LocalBookIsarModel>().put(book)));
 }
