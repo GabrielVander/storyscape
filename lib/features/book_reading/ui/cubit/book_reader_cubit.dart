@@ -42,7 +42,6 @@ class BookReaderCubit extends Cubit<BookReaderState> {
   }
 
   void updateDownloadPercentage(double percentage) {
-    _logger.debug('Updating download percentage');
     final leadingZerosRegex = RegExp(r'\.?0*$');
     final String prettyPercentage = percentage.toStringAsFixed(2).replaceFirst(leadingZerosRegex, '');
 
