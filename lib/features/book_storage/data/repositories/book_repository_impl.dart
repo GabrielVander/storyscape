@@ -20,7 +20,7 @@ class BookRepositoryImpl implements BookRepository {
 
   @override
   Future<Result<ExistingBook, String>> storeNewBook(NewBook book) async => Future.value(Ok<NewBook, String>(book))
-      .andThen(_localBookIsarModelMapper.call)
+      .andThen(_localBookIsarModelMapper.fromNewBook)
       .andThen(_isarDataSource.upsertBook)
       .map((id) => ExistingBook(id: id, url: book.url))
       .inspectErr(_logger.warn);

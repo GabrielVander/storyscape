@@ -24,23 +24,23 @@ void main() {
   tearDown(resetMocktailState);
 
   test('should return Err if unable to map new book to local Isar book when saving new book', () async {
-    when(() => localBookIsarModelMapper.call(any())).thenReturn(const Err('plVDTJEUQ'));
+    when(() => localBookIsarModelMapper.fromNewBook(any())).thenReturn(const Err('plVDTJEUQ'));
 
-    final newBook = NewBook(url: '164ae471-41f0-4453-a2ce-cf5576c19172');
+    const newBook = NewBook(url: '164ae471-41f0-4453-a2ce-cf5576c19172');
     final Result<ExistingBook, String> result = await repository.storeNewBook(newBook);
 
     expect(result, const Err<dynamic, String>('plVDTJEUQ'));
-    verify(() => localBookIsarModelMapper.call(newBook)).called(1);
+    verify(() => localBookIsarModelMapper.fromNewBook(newBook)).called(1);
   });
 
   test('should return Err if isar data source fails when saving new book', () async {
     final LocalBookIsarModel localBookIsarModel = _MockLocalBookIsarModel();
 
-    when(() => localBookIsarModelMapper.call(any())).thenReturn(Ok(localBookIsarModel));
+    when(() => localBookIsarModelMapper.fromNewBook(any())).thenReturn(Ok(localBookIsarModel));
     when(() => isarDataSource.upsertBook(any())).thenAnswer((_) async => const Err('FSQXowQV'));
 
     final Result<ExistingBook, String> result =
-        await repository.storeNewBook(NewBook(url: '164ae471-41f0-4453-a2ce-cf5576c19172'));
+        await repository.storeNewBook(const NewBook(url: '164ae471-41f0-4453-a2ce-cf5576c19172'));
 
     expect(result, const Err<dynamic, String>('FSQXowQV'));
     verify(() => isarDataSource.upsertBook(localBookIsarModel)).called(1);
@@ -49,16 +49,16 @@ void main() {
   test('should return Ok with existing book if operation succeeds when saving new book', () async {
     final LocalBookIsarModel localBookIsarModel = _MockLocalBookIsarModel();
     const String url = '164ae471-41f0-4453-a2ce-cf5576c19172';
-    final NewBook newBook = NewBook(url: url);
+    const NewBook newBook = NewBook(url: url);
     const int id = 783;
 
-    when(() => localBookIsarModelMapper.call(any())).thenReturn(Ok(localBookIsarModel));
+    when(() => localBookIsarModelMapper.fromNewBook(any())).thenReturn(Ok(localBookIsarModel));
     when(() => isarDataSource.upsertBook(any())).thenAnswer((_) async => const Ok(id));
 
     final Result<ExistingBook, String> result = await repository.storeNewBook(newBook);
 
     expect(result, const Ok(ExistingBook(id: id, url: url)));
-    verify(() => localBookIsarModelMapper.call(newBook)).called(1);
+    verify(() => localBookIsarModelMapper.fromNewBook(newBook)).called(1);
     verify(() => isarDataSource.upsertBook(localBookIsarModel)).called(1);
   });
 }
