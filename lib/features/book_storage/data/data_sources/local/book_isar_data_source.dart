@@ -9,7 +9,10 @@ import 'package:storyscape/features/book_storage/data/data_sources/local/models/
 
 abstract interface class BookIsarDataSource {
   Future<Result<int, String>> upsertBook(LocalBookIsarModel model);
+
   Future<Result<LocalBookIsarModel, String>> getBookById(Id id);
+
+  Future<Result<List<LocalBookIsarModel>, String>> getAllBooks();
 }
 
 class BookIsarDataSourceImpl implements BookIsarDataSource {
@@ -35,5 +38,13 @@ class BookIsarDataSourceImpl implements BookIsarDataSource {
   Future<Result<LocalBookIsarModel, String>> getBookById(Id id) {
     // TODO: implement getBookById
     throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<List<LocalBookIsarModel>, String>> getAllBooks() async {
+    _logger.debug('Getting all books from Isar...');
+
+    return Ok<List<LocalBookIsarModel>, String>(await _isar.collection<LocalBookIsarModel>().where().findAll())
+        .inspect((models) => _logger.debug('Found ${models.length} models'));
   }
 }
