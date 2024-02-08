@@ -6,7 +6,7 @@ import 'package:storyscape/core/routing/routes.dart';
 import 'package:storyscape/features/book_selection/ui/cubit/book_selection_cubit.dart';
 import 'package:storyscape/features/book_selection/ui/widgets/book_url_field.dart';
 
-class BookSelectionPage extends StatelessWidget {
+class BookSelectionPage extends HookWidget {
   const BookSelectionPage({required BookSelectionCubit bookSelectionCubit, super.key})
       : _bookSelectionCubit = bookSelectionCubit;
 
@@ -14,24 +14,40 @@ class BookSelectionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomSheetAnimationController = useAnimationController(duration: const Duration(milliseconds: 200));
+
     return Scaffold(
       appBar: AppBar(
         title: Text('bookSelection.pageTitle'.tr()),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(15),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet<void>(
+            context: context,
+            builder: (context) => BottomSheet(
+              onClosing: () {},
+              animationController: bottomSheetAnimationController,
+              showDragHandle: true,
+              builder: (BuildContext context) => _AddBookByUrl(
+                bookSelectionCubit: _bookSelectionCubit,
+              ),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
+      body: const Padding(
+        padding: EdgeInsets.all(15),
         child: Center(
-          child: _Body(
-            bookSelectionCubit: _bookSelectionCubit,
-          ),
+          child: FlutterLogo(),
         ),
       ),
     );
   }
 }
 
-class _Body extends HookWidget {
-  const _Body({required this.bookSelectionCubit});
+class _AddBookByUrl extends HookWidget {
+  const _AddBookByUrl({required this.bookSelectionCubit});
 
   final BookSelectionCubit bookSelectionCubit;
 
@@ -47,8 +63,11 @@ class _Body extends HookWidget {
       listenWhen: (current) => current is BookSelectionSelected,
     );
 
-    return BookUrlField(
-      onFinished: bookSelectionCubit.selectBookUrl,
+    return Padding(
+      padding: const EdgeInsets.all(15),
+      child: BookUrlField(
+        onFinished: bookSelectionCubit.selectBookUrl,
+      ),
     );
   }
 }
