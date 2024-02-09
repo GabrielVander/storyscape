@@ -1,6 +1,6 @@
 part of 'book_selection_cubit.dart';
 
-abstract class BookSelectionState extends Equatable {
+sealed class BookSelectionState extends Equatable {
   const BookSelectionState();
 }
 
@@ -31,4 +31,13 @@ class BookSelectionSelected extends BookSelectionState {
 
   @override
   List<Object?> get props => [url];
+}
+
+class BookSelectionBooksLoaded extends BookSelectionState {
+  const BookSelectionBooksLoaded({required this.books});
+
+  final List<StoredBook> books;
+
+  @override
+  List<Object?> get props => [books];
 }

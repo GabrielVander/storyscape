@@ -14,7 +14,8 @@ class BookSelectionPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomSheetAnimationController = useAnimationController(duration: const Duration(milliseconds: 200));
+    final AnimationController bottomSheetAnimationController =
+        useAnimationController(duration: const Duration(milliseconds: 200));
 
     return Scaffold(
       appBar: AppBar(
@@ -36,13 +37,71 @@ class BookSelectionPage extends HookWidget {
         },
         child: const Icon(Icons.add),
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(15),
-        child: Center(
-          child: FlutterLogo(),
+      body: Padding(
+        padding: const EdgeInsets.all(15),
+        child: BookSelection(
+          bookSelectionCubit: _bookSelectionCubit,
         ),
       ),
     );
+  }
+}
+
+class BookSelection extends HookWidget {
+  const BookSelection({required BookSelectionCubit bookSelectionCubit, super.key})
+      : _bookSelectionCubit = bookSelectionCubit;
+
+  final BookSelectionCubit _bookSelectionCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    useEffect(
+      () {
+        _bookSelectionCubit.fetchStoredBooks();
+
+        return null;
+      },
+      [],
+    );
+
+    final BookSelectionState state = useBlocBuilder(_bookSelectionCubit);
+
+    switch (state) {
+      case BookSelectionSelected(:final url):
+        BookReadingRoute(url: url).push<void>(context);
+        return const Center(child: CircularProgressIndicator());
+
+      case BookSelectionInitial() || BookSelectionLoading():
+        return const Center(child: CircularProgressIndicator());
+
+      case BookSelectionError(:final errorCode, :final errorContext):
+        return Center(
+          child: Column(
+            children: [
+              Text('bookSelection.error.genericErrorMessage'.tr()),
+              Text('$errorCode: $errorContext'),
+            ],
+          ),
+        );
+
+      case BookSelectionBooksLoaded(:final books):
+        return GridView.count(
+          crossAxisCount: 2,
+          children: books
+              .map(
+                (book) => Card.outlined(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const FlutterLogo(size: 72),
+                      Text(book.url),
+                    ],
+                  ),
+                ),
+              )
+              .toList(),
+        );
+    }
   }
 }
 
@@ -53,16 +112,6 @@ class _AddBookByUrl extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    useBlocListener(
-      bookSelectionCubit,
-      (bloc, current, context) {
-        if (current case BookSelectionSelected(:final url)) {
-          BookReadingRoute(url: url).push<void>(context);
-        }
-      },
-      listenWhen: (current) => current is BookSelectionSelected,
-    );
-
     return Padding(
       padding: const EdgeInsets.all(15),
       child: BookUrlField(
