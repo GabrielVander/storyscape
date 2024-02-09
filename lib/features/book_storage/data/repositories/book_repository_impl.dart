@@ -5,6 +5,7 @@ import 'package:storyscape/features/book_storage/data/data_sources/local/book_is
 import 'package:storyscape/features/book_storage/data/data_sources/local/models/local_book_isar_model.dart';
 import 'package:storyscape/features/book_storage/domain/entities/existing_book.dart';
 import 'package:storyscape/features/book_storage/domain/entities/new_book.dart';
+import 'package:storyscape/features/book_storage/domain/entities/stored_book.dart';
 import 'package:storyscape/features/book_storage/domain/repositories/book_repository.dart';
 
 class BookRepositoryImpl implements BookRepository {
@@ -77,4 +78,21 @@ class BookRepositoryImpl implements BookRepository {
 
   FutureResult<LocalBookIsarModel, String> _retrieveLocalIsarBookById(int id) =>
       Future.value(Ok<int, String>(id)).andThen(_isarDataSource.getBookById).inspectErr(_logger.warn);
+
+  @override
+  FutureResult<List<StoredBook>, String> fetchAllBooks() async {
+    _logger.debug('Fetching all stored books...');
+
+    return _fetchAllBooksFromIsar()
+        .map((models) => _mapLocalIsarBookModelsToStoredBooks(models).toList())
+        .mapErr((_) => 'Unable to fetch books');
+  }
+
+  Iterable<StoredBook> _mapLocalIsarBookModelsToStoredBooks(List<LocalBookIsarModel> models) =>
+      models.map(_mapSingleLocalIsarBookToStoredBook);
+
+  StoredBook _mapSingleLocalIsarBookToStoredBook(LocalBookIsarModel m) => StoredBook(url: m.url);
+
+  FutureResult<List<LocalBookIsarModel>, String> _fetchAllBooksFromIsar() =>
+      _isarDataSource.getAllBooks().inspectErr(_logger.warn);
 }

@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rust_core/result.dart';
-import 'package:storyscape/features/book_selection/domain/entities/stored_book.dart';
 import 'package:storyscape/features/book_storage/domain/entities/new_book.dart';
+import 'package:storyscape/features/book_storage/domain/entities/stored_book.dart';
 import 'package:storyscape/features/book_storage/domain/use_cases/store_new_book.dart';
 
 part 'book_selection_state.dart';
