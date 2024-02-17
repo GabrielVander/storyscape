@@ -36,7 +36,7 @@ class BookIsarDataSourceImpl implements BookIsarDataSource {
 
   @override
   Future<Result<LocalBookIsarModel, String>> getBookById(Id id) {
-    // TODO: implement getBookById
+    // TODO(GabrielVander): Implement getBookById
     throw UnimplementedError();
   }
 

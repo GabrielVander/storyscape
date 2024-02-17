@@ -26,7 +26,7 @@ class LocalBookIsarModelMapperImpl implements LocalBookIsarModelMapper {
 
   @override
   Result<ExistingBook, String> toExistingBook(LocalBookIsarModel model) {
-    // TODO: implement toExistingBook
+    // TODO(GabrielVander): Implement toExistingBook
     throw UnimplementedError();
   }
 }
