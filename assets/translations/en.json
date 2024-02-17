@@ -9,6 +9,9 @@
   },
   "bookSelection": {
     "pageTitle": "Open book",
-    "urlFieldLabel": "Book URL"
+    "urlFieldLabel": "Book URL",
+    "error": {
+      "genericErrorMessage": "Something went wrong"
+    }
   }
 }

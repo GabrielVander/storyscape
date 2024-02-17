@@ -6,8 +6,6 @@
 name: Flutter Analysis/Test
 
 on:
-  push:
-    branches: [ "develop", "master" ]
   pull_request:
     branches: [ "develop", "master" ]
 
@@ -31,6 +29,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Generate sources
+        run: dart run build_runner build --delete-conflicting-outputs
 
       # Uncomment this step to verify the use of 'dart format' on each commit.
       #- name: Verify formatting
