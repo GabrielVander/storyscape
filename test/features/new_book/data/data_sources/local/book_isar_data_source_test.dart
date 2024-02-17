@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:isar/isar.dart';
 import 'package:mocktail/mocktail.dart';
@@ -6,14 +8,18 @@ import 'package:storyscape/features/new_book/data/data_sources/local/book_isar_d
 import 'package:storyscape/features/new_book/data/data_sources/local/models/local_book_isar_model.dart';
 
 void main() {
+  const String isarDbDirectoryPath = 'test/features/new_book/data/data_sources/local/isar_db';
   late Isar isar;
   late BookIsarDataSourceImpl dataSource;
 
   setUpAll(() async {
+    final Directory isarDbDirectory = await Directory(isarDbDirectoryPath).create(recursive: true);
+
     await Isar.initializeIsarCore(download: true);
+
     isar = await Isar.open(
       [LocalBookIsarModelSchema],
-      directory: 'test/features/new_book/data/data_sources/local/isar_db',
+      directory: isarDbDirectory.path,
     );
 
     await isar.writeTxn(() async {
@@ -21,8 +27,9 @@ void main() {
     });
   });
 
-  tearDownAll(() {
-    isar.close(deleteFromDisk: true);
+  tearDownAll(() async {
+    await Directory(isarDbDirectoryPath).delete(recursive: true);
+    await isar.close(deleteFromDisk: true);
   });
 
   setUp(() {
