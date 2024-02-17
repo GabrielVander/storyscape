@@ -5,8 +5,8 @@ import 'package:rust_core/result.dart';
 import 'package:storyscape/features/new_book/domain/entities/existing_book.dart';
 import 'package:storyscape/features/new_book/domain/entities/new_book.dart';
 import 'package:storyscape/features/new_book/domain/use_cases/store_new_book.dart';
-import 'package:storyscape/features/select_book/domain/entities/stored_book.dart';
-import 'package:storyscape/features/select_book/domain/use_cases/retrieve_stored_books.dart';
+import 'package:storyscape/features/select_book/domain/entities/available_book.dart';
+import 'package:storyscape/features/select_book/domain/use_cases/retrieve_available_books.dart';
 import 'package:storyscape/features/select_book/ui/cubit/book_selection_cubit.dart';
 
 void main() {
@@ -91,8 +91,8 @@ void main() {
     build: () => cubit,
     setUp: () => when(() => retrieveStoredBooks.call()).thenAnswer(
       (_) async => Ok([
-        StoredBook(url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-        StoredBook(url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+        AvailableBook(url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+        AvailableBook(url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
       ]),
     ),
     act: (cubit) => cubit.loadStoredBooks(),

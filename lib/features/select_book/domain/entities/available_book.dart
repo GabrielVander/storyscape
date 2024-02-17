@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-class StoredBook with EquatableMixin {
-  StoredBook({required this.url});
+class AvailableBook with EquatableMixin {
+  AvailableBook({required this.url});
 
   final String url;
 
