@@ -6,14 +6,14 @@ import 'package:get_it/get_it.dart';
 import 'package:internet_file/internet_file.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:storyscape/features/book_reading/ui/cubit/book_reader_cubit.dart';
-import 'package:storyscape/features/book_selection/ui/cubit/book_selection_cubit.dart';
-import 'package:storyscape/features/book_storage/data/data_sources/local/book_isar_data_source.dart';
-import 'package:storyscape/features/book_storage/data/data_sources/local/models/local_book_isar_model.dart';
-import 'package:storyscape/features/book_storage/data/repositories/book_repository_impl.dart';
-import 'package:storyscape/features/book_storage/domain/repositories/book_repository.dart';
-import 'package:storyscape/features/book_storage/domain/use_cases/retrieve_stored_books.dart';
-import 'package:storyscape/features/book_storage/domain/use_cases/store_new_book.dart';
+import 'package:storyscape/features/new_book/data/data_sources/local/book_isar_data_source.dart';
+import 'package:storyscape/features/new_book/data/data_sources/local/models/local_book_isar_model.dart';
+import 'package:storyscape/features/new_book/data/repositories/book_repository_impl.dart';
+import 'package:storyscape/features/new_book/domain/repositories/book_repository.dart';
+import 'package:storyscape/features/new_book/domain/use_cases/retrieve_stored_books.dart';
+import 'package:storyscape/features/new_book/domain/use_cases/store_new_book.dart';
+import 'package:storyscape/features/read_book/ui/cubit/book_reader_cubit.dart';
+import 'package:storyscape/features/select_book/ui/cubit/book_selection_cubit.dart';
 import 'package:storyscape/storyscape.dart';
 
 Future<void> main() async {

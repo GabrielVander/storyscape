@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:storyscape/features/book_reading/ui/cubit/book_reader_cubit.dart';
-import 'package:storyscape/features/book_reading/ui/pages/book_reader_page.dart';
-import 'package:storyscape/features/book_selection/ui/cubit/book_selection_cubit.dart';
-import 'package:storyscape/features/book_selection/ui/pages/book_selection_page.dart';
+import 'package:storyscape/features/read_book/ui/cubit/book_reader_cubit.dart';
+import 'package:storyscape/features/read_book/ui/pages/book_reader_page.dart';
+import 'package:storyscape/features/select_book/ui/cubit/book_selection_cubit.dart';
+import 'package:storyscape/features/select_book/ui/pages/book_selection_page.dart';
 
 part 'routes.g.dart';
 
