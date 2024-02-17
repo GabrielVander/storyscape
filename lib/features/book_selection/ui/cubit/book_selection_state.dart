@@ -36,8 +36,23 @@ class BookSelectionSelected extends BookSelectionState {
 class BookSelectionBooksLoaded extends BookSelectionState {
   const BookSelectionBooksLoaded({required this.books});
 
-  final List<StoredBook> books;
+  final List<BookSelectionViewModel> books;
 
   @override
   List<Object?> get props => [books];
+}
+
+class BookSelectionViewModel with EquatableMixin {
+  BookSelectionViewModel({required this.displayName});
+
+  final String displayName;
+
+  BookSelectionViewModel copyWith({String? displayName}) =>
+      BookSelectionViewModel(displayName: displayName ?? this.displayName);
+
+  @override
+  List<Object> get props => [displayName];
+
+  @override
+  String toString() => 'BookSelectionViewModel{displayName: $displayName}';
 }

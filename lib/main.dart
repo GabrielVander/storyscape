@@ -12,6 +12,7 @@ import 'package:storyscape/features/book_storage/data/data_sources/local/book_is
 import 'package:storyscape/features/book_storage/data/data_sources/local/models/local_book_isar_model.dart';
 import 'package:storyscape/features/book_storage/data/repositories/book_repository_impl.dart';
 import 'package:storyscape/features/book_storage/domain/repositories/book_repository.dart';
+import 'package:storyscape/features/book_storage/domain/use_cases/retrieve_stored_books.dart';
 import 'package:storyscape/features/book_storage/domain/use_cases/store_new_book.dart';
 import 'package:storyscape/storyscape.dart';
 
@@ -79,7 +80,9 @@ void _setUpBookStorageInjections(GetIt locator) {
 }
 
 void _setUpBookSelectionInjections(GetIt locator) {
-  locator.registerLazySingleton<BookSelectionCubit>(
-    () => BookSelectionCubit(storeNewBookUseCase: locator.get<StoreNewBook>()),
-  );
+  locator
+    ..registerLazySingleton<RetrieveStoredBooks>(() => RetrieveStoredBooksImpl(bookRepository: locator.get()))
+    ..registerLazySingleton<BookSelectionCubit>(
+      () => BookSelectionCubit(storeNewBookUseCase: locator.get<StoreNewBook>(), retrieveStoredBooks: locator.get()),
+    );
 }

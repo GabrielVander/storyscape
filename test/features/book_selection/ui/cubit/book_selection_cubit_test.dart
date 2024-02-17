@@ -5,16 +5,20 @@ import 'package:rust_core/result.dart';
 import 'package:storyscape/features/book_selection/ui/cubit/book_selection_cubit.dart';
 import 'package:storyscape/features/book_storage/domain/entities/existing_book.dart';
 import 'package:storyscape/features/book_storage/domain/entities/new_book.dart';
+import 'package:storyscape/features/book_storage/domain/entities/stored_book.dart';
+import 'package:storyscape/features/book_storage/domain/use_cases/retrieve_stored_books.dart';
 import 'package:storyscape/features/book_storage/domain/use_cases/store_new_book.dart';
 
 void main() {
   late StoreNewBook storeNewBookUseCase;
+  late RetrieveStoredBooks retrieveStoredBooks;
   late BookSelectionCubit cubit;
 
   setUp(() {
     storeNewBookUseCase = _MockStoreNewBook();
+    retrieveStoredBooks = _MockRetrieveStoredBooks();
 
-    cubit = BookSelectionCubit(storeNewBookUseCase: storeNewBookUseCase);
+    cubit = BookSelectionCubit(storeNewBookUseCase: storeNewBookUseCase, retrieveStoredBooks: retrieveStoredBooks);
 
     registerFallbackValue(_MockNewBook());
   });
@@ -58,8 +62,55 @@ void main() {
     verify: (_) =>
         verify(() => storeNewBookUseCase.execute(const NewBook(url: '836945f1-1d12-419c-a736-69db139a6e62'))).called(1),
   );
+
+  blocTest<BookSelectionCubit, BookSelectionState>(
+    'should emit loading state when loading stored books',
+    build: () => cubit,
+    setUp: () => when(() => retrieveStoredBooks()).thenAnswer((_) async => const Err('2jsXCkkYd6W')),
+    act: (cubit) => cubit.loadStoredBooks(),
+    expect: () => containsAllInOrder([BookSelectionLoading()]),
+  );
+
+  blocTest<BookSelectionCubit, BookSelectionState>(
+    'should emit err state if book retrieval operation fails when loading stored books',
+    build: () => cubit,
+    setUp: () => when(() => retrieveStoredBooks.call()).thenAnswer((_) async => const Err('AEMUHhSVT2Z')),
+    act: (cubit) => cubit.loadStoredBooks(),
+    skip: 1,
+    expect: () => [
+      BookSelectionError(
+        errorCode: BookSelectionErrorCode.unableToLoadStoredBooks.name,
+        errorContext: 'AEMUHhSVT2Z',
+      ),
+    ],
+    verify: (_) => verify(() => retrieveStoredBooks.call()).called(1),
+  );
+
+  blocTest<BookSelectionCubit, BookSelectionState>(
+    'should emit loaded state if book retrieval operation succeeds when loading stored books',
+    build: () => cubit,
+    setUp: () => when(() => retrieveStoredBooks.call()).thenAnswer(
+      (_) async => Ok([
+        StoredBook(url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+        StoredBook(url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+      ]),
+    ),
+    act: (cubit) => cubit.loadStoredBooks(),
+    skip: 1,
+    expect: () => [
+      BookSelectionBooksLoaded(
+        books: [
+          BookSelectionViewModel(displayName: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+          BookSelectionViewModel(displayName: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+        ],
+      ),
+    ],
+    verify: (_) => verify(() => retrieveStoredBooks()).called(1),
+  );
 }
 
 class _MockStoreNewBook extends Mock implements StoreNewBook {}
+
+class _MockRetrieveStoredBooks extends Mock implements RetrieveStoredBooks {}
 
 class _MockNewBook extends Mock implements NewBook {}

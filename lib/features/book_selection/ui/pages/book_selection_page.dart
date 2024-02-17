@@ -57,7 +57,7 @@ class BookSelection extends HookWidget {
   Widget build(BuildContext context) {
     useEffect(
       () {
-        _bookSelectionCubit.fetchStoredBooks();
+        _bookSelectionCubit.loadStoredBooks();
 
         return null;
       },
@@ -94,7 +94,7 @@ class BookSelection extends HookWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const FlutterLogo(size: 72),
-                      Text(book.url),
+                      Text(book.displayName),
                     ],
                   ),
                 ),
