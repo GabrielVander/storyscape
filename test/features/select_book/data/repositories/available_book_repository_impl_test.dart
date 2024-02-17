@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rust_core/result.dart';
-import 'package:storyscape/features/new_book/data/data_sources/local/book_isar_data_source.dart';
-import 'package:storyscape/features/new_book/data/data_sources/local/models/local_book_isar_model.dart';
+import 'package:storyscape/features/book_storage/data/data_sources/local/book_isar_data_source.dart';
+import 'package:storyscape/features/book_storage/data/data_sources/local/models/local_book_isar_model.dart';
 import 'package:storyscape/features/select_book/data/repositories/available_book_repository_impl.dart';
 import 'package:storyscape/features/select_book/domain/entities/available_book.dart';
 
