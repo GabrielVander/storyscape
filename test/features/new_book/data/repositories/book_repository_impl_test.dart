@@ -6,7 +6,7 @@ import 'package:storyscape/features/new_book/data/data_sources/local/models/loca
 import 'package:storyscape/features/new_book/data/repositories/book_repository_impl.dart';
 import 'package:storyscape/features/new_book/domain/entities/existing_book.dart';
 import 'package:storyscape/features/new_book/domain/entities/new_book.dart';
-import 'package:storyscape/features/new_book/domain/entities/stored_book.dart';
+import 'package:storyscape/features/select_book/domain/entities/stored_book.dart';
 
 void main() {
   late BookIsarDataSource isarDataSource;

@@ -4,9 +4,9 @@ import 'package:mocktail/mocktail.dart';
 import 'package:rust_core/result.dart';
 import 'package:storyscape/features/new_book/domain/entities/existing_book.dart';
 import 'package:storyscape/features/new_book/domain/entities/new_book.dart';
-import 'package:storyscape/features/new_book/domain/entities/stored_book.dart';
-import 'package:storyscape/features/new_book/domain/use_cases/retrieve_stored_books.dart';
 import 'package:storyscape/features/new_book/domain/use_cases/store_new_book.dart';
+import 'package:storyscape/features/select_book/domain/entities/stored_book.dart';
+import 'package:storyscape/features/select_book/domain/use_cases/retrieve_stored_books.dart';
 import 'package:storyscape/features/select_book/ui/cubit/book_selection_cubit.dart';
 
 void main() {

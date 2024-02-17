@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rust_core/result.dart';
-import 'package:storyscape/features/new_book/domain/entities/stored_book.dart';
 import 'package:storyscape/features/new_book/domain/repositories/book_repository.dart';
-import 'package:storyscape/features/new_book/domain/use_cases/retrieve_stored_books.dart';
+import 'package:storyscape/features/select_book/domain/entities/stored_book.dart';
+import 'package:storyscape/features/select_book/domain/use_cases/retrieve_stored_books.dart';
 
 void main() {
   late BookRepository bookRepository;

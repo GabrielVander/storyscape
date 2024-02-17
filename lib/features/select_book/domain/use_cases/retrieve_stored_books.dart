@@ -1,8 +1,8 @@
 import 'package:rust_core/result.dart';
 import 'package:storyscape/core/logging/storyscape_logger.dart';
 import 'package:storyscape/core/logging/storyscape_logger_factory.dart';
-import 'package:storyscape/features/new_book/domain/entities/stored_book.dart';
 import 'package:storyscape/features/new_book/domain/repositories/book_repository.dart';
+import 'package:storyscape/features/select_book/domain/entities/stored_book.dart';
 
 abstract interface class RetrieveStoredBooks {
   FutureResult<List<StoredBook>, String> call();

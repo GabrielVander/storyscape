@@ -5,8 +5,8 @@ import 'package:storyscape/features/new_book/data/data_sources/local/book_isar_d
 import 'package:storyscape/features/new_book/data/data_sources/local/models/local_book_isar_model.dart';
 import 'package:storyscape/features/new_book/domain/entities/existing_book.dart';
 import 'package:storyscape/features/new_book/domain/entities/new_book.dart';
-import 'package:storyscape/features/new_book/domain/entities/stored_book.dart';
 import 'package:storyscape/features/new_book/domain/repositories/book_repository.dart';
+import 'package:storyscape/features/select_book/domain/entities/stored_book.dart';
 
 class BookRepositoryImpl implements BookRepository {
   BookRepositoryImpl({

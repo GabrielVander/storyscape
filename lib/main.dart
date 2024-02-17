@@ -10,9 +10,9 @@ import 'package:storyscape/features/new_book/data/data_sources/local/book_isar_d
 import 'package:storyscape/features/new_book/data/data_sources/local/models/local_book_isar_model.dart';
 import 'package:storyscape/features/new_book/data/repositories/book_repository_impl.dart';
 import 'package:storyscape/features/new_book/domain/repositories/book_repository.dart';
-import 'package:storyscape/features/new_book/domain/use_cases/retrieve_stored_books.dart';
 import 'package:storyscape/features/new_book/domain/use_cases/store_new_book.dart';
 import 'package:storyscape/features/read_book/ui/cubit/book_reader_cubit.dart';
+import 'package:storyscape/features/select_book/domain/use_cases/retrieve_stored_books.dart';
 import 'package:storyscape/features/select_book/ui/cubit/book_selection_cubit.dart';
 import 'package:storyscape/storyscape.dart';
 
