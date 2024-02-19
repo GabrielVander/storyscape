@@ -3,7 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:rust_core/result.dart';
 import 'package:storyscape/features/select_book/domain/entities/available_book.dart';
 import 'package:storyscape/features/select_book/domain/repositories/available_book_repository.dart';
-import 'package:storyscape/features/select_book/domain/use_cases/retrieve_available_books.dart';
+import 'package:storyscape/features/select_book/domain/usecases/retrieve_available_books.dart';
 
 void main() {
   late AvailableBookRepository availableBookRepository;

@@ -4,7 +4,7 @@ import 'package:rust_core/result.dart';
 import 'package:storyscape/features/new_book/domain/entities/existing_book.dart';
 import 'package:storyscape/features/new_book/domain/entities/new_book.dart';
 import 'package:storyscape/features/new_book/domain/repositories/book_repository.dart';
-import 'package:storyscape/features/new_book/domain/use_cases/store_new_book.dart';
+import 'package:storyscape/features/new_book/domain/usecases/store_new_book.dart';
 
 void main() {
   late BookRepository bookRepository;
