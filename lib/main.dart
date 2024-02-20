@@ -11,6 +11,8 @@ import 'package:storyscape/features/book_storage/data/data_sources/local/models/
 import 'package:storyscape/features/new_book/data/repositories/book_repository_impl.dart';
 import 'package:storyscape/features/new_book/domain/repositories/book_repository.dart';
 import 'package:storyscape/features/new_book/domain/usecases/store_new_book.dart';
+import 'package:storyscape/features/new_book/ui/cubit/new_book_cubit.dart';
+import 'package:storyscape/features/new_book/ui/widgets/new_book_by_url.dart';
 import 'package:storyscape/features/read_book/ui/cubit/book_reader_cubit.dart';
 import 'package:storyscape/features/select_book/data/repositories/available_book_repository_impl.dart';
 import 'package:storyscape/features/select_book/domain/repositories/available_book_repository.dart';
@@ -83,7 +85,9 @@ void _setUpNewBookInjections(GetIt locator) {
         localBookIsarModelMapper: locator.get<LocalBookIsarModelMapper>(),
       ),
     )
-    ..registerLazySingleton<StoreNewBook>(() => StoreNewBookImpl(bookRepository: locator.get<BookRepository>()));
+    ..registerLazySingleton<StoreNewBook>(() => StoreNewBookImpl(bookRepository: locator.get<BookRepository>()))
+    ..registerLazySingleton<NewBookCubit>(NewBookCubit.new)
+    ..registerFactory<NewBookByUrl>(() => NewBookByUrl(newBookCubit: locator.get()));
 }
 
 void _setUpSelectBookInjections(GetIt locator) {

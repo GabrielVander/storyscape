@@ -3,14 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooked_bloc/hooked_bloc.dart';
 import 'package:storyscape/core/routing/routes.dart';
+import 'package:storyscape/features/new_book/ui/widgets/new_book_by_url.dart';
 import 'package:storyscape/features/select_book/ui/cubit/book_selection_cubit.dart';
-import 'package:storyscape/features/select_book/ui/widgets/book_url_field.dart';
 
 class BookSelectionPage extends HookWidget {
-  const BookSelectionPage({required BookSelectionCubit bookSelectionCubit, super.key})
-      : _bookSelectionCubit = bookSelectionCubit;
+  const BookSelectionPage({
+    required BookSelectionCubit bookSelectionCubit,
+    required NewBookByUrl newBookByUrlWidget,
+    super.key,
+  })  : _bookSelectionCubit = bookSelectionCubit,
+        _newBookByUrlWidget = newBookByUrlWidget;
 
   final BookSelectionCubit _bookSelectionCubit;
+  final NewBookByUrl _newBookByUrlWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +34,7 @@ class BookSelectionPage extends HookWidget {
               onClosing: () {},
               animationController: bottomSheetAnimationController,
               showDragHandle: true,
-              builder: (BuildContext context) => _AddBookByUrl(
-                bookSelectionCubit: _bookSelectionCubit,
-              ),
+              builder: (BuildContext context) => _newBookByUrlWidget,
             ),
           );
         },
@@ -102,21 +105,5 @@ class BookSelection extends HookWidget {
               .toList(),
         );
     }
-  }
-}
-
-class _AddBookByUrl extends HookWidget {
-  const _AddBookByUrl({required this.bookSelectionCubit});
-
-  final BookSelectionCubit bookSelectionCubit;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(15),
-      child: BookUrlField(
-        onFinished: bookSelectionCubit.selectBookUrl,
-      ),
-    );
   }
 }
