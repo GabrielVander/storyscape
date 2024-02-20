@@ -10,9 +10,10 @@ import 'package:storyscape/features/book_storage/data/data_sources/local/book_is
 import 'package:storyscape/features/book_storage/data/data_sources/local/models/local_book_isar_model.dart';
 import 'package:storyscape/features/new_book/data/repositories/book_repository_impl.dart';
 import 'package:storyscape/features/new_book/domain/repositories/book_repository.dart';
+import 'package:storyscape/features/new_book/domain/usecases/download_epub_book_by_url.dart';
 import 'package:storyscape/features/new_book/domain/usecases/store_new_book.dart';
 import 'package:storyscape/features/new_book/ui/cubit/new_book_cubit.dart';
-import 'package:storyscape/features/new_book/ui/widgets/new_book_by_url.dart';
+import 'package:storyscape/features/new_book/ui/widgets/new_book_modal.dart';
 import 'package:storyscape/features/read_book/ui/cubit/book_reader_cubit.dart';
 import 'package:storyscape/features/select_book/data/repositories/available_book_repository_impl.dart';
 import 'package:storyscape/features/select_book/domain/repositories/available_book_repository.dart';
@@ -85,9 +86,12 @@ void _setUpNewBookInjections(GetIt locator) {
         localBookIsarModelMapper: locator.get<LocalBookIsarModelMapper>(),
       ),
     )
+    ..registerLazySingleton<DownloadEpubBookByUrl>(DownloadEpubBookUrlImpl.new)
     ..registerLazySingleton<StoreNewBook>(() => StoreNewBookImpl(bookRepository: locator.get<BookRepository>()))
-    ..registerLazySingleton<NewBookCubit>(NewBookCubit.new)
-    ..registerFactory<NewBookByUrl>(() => NewBookByUrl(newBookCubit: locator.get()));
+    ..registerLazySingleton<NewBookCubit>(
+      () => NewBookCubit(downloadEpubBookByUrl: locator.get(), storeNewBook: locator.get()),
+    )
+    ..registerFactory<NewBookModal>(() => NewBookModal(newBookCubit: locator.get()));
 }
 
 void _setUpSelectBookInjections(GetIt locator) {

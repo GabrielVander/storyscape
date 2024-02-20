@@ -3,41 +3,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooked_bloc/hooked_bloc.dart';
 import 'package:storyscape/core/routing/routes.dart';
-import 'package:storyscape/features/new_book/ui/widgets/new_book_by_url.dart';
+import 'package:storyscape/features/new_book/ui/widgets/new_book_modal.dart';
 import 'package:storyscape/features/select_book/ui/cubit/book_selection_cubit.dart';
 
 class BookSelectionPage extends HookWidget {
   const BookSelectionPage({
     required BookSelectionCubit bookSelectionCubit,
-    required NewBookByUrl newBookByUrlWidget,
+    required NewBookModal newBookModal,
     super.key,
   })  : _bookSelectionCubit = bookSelectionCubit,
-        _newBookByUrlWidget = newBookByUrlWidget;
+        _newBookModal = newBookModal;
 
   final BookSelectionCubit _bookSelectionCubit;
-  final NewBookByUrl _newBookByUrlWidget;
+  final NewBookModal _newBookModal;
 
   @override
   Widget build(BuildContext context) {
-    final AnimationController bottomSheetAnimationController =
-        useAnimationController(duration: const Duration(milliseconds: 200));
-
     return Scaffold(
       appBar: AppBar(
         title: Text('bookSelection.pageTitle'.tr()),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet<void>(
-            context: context,
-            builder: (context) => BottomSheet(
-              onClosing: () {},
-              animationController: bottomSheetAnimationController,
-              showDragHandle: true,
-              builder: (BuildContext context) => _newBookByUrlWidget,
-            ),
-          );
-        },
+        onPressed: () => _newBookModal.display(context),
         child: const Icon(Icons.add),
       ),
       body: Padding(
