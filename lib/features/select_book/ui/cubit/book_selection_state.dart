@@ -14,14 +14,21 @@ class BookSelectionLoading extends BookSelectionState {
   List<Object> get props => [];
 }
 
-class BookSelectionError extends BookSelectionState {
-  const BookSelectionError({required this.errorCode, required this.errorContext});
+class BookSelectionLoadingError extends BookSelectionState {
+  const BookSelectionLoadingError({required this.errorCode, required this.errorContext});
 
   final String errorCode;
   final String? errorContext;
 
   @override
   List<Object?> get props => [errorCode, errorContext];
+}
+
+class BookSelectionUpdateError extends BookSelectionState {
+  const BookSelectionUpdateError();
+
+  @override
+  List<Object?> get props => [];
 }
 
 class BookSelectionSelected extends BookSelectionState {

@@ -53,8 +53,23 @@ class BookSelection extends HookWidget {
       },
       [],
     );
+    useBlocListener(
+      _bookSelectionCubit,
+      (bloc, current, context) => ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('bookSelection.error.unableToUpdateBooks'.tr()))),
+      listenWhen: (s) => [BookSelectionUpdateError].contains(s.runtimeType),
+    );
 
-    final BookSelectionState state = useBlocBuilder(_bookSelectionCubit);
+    final BookSelectionState state = useBlocBuilder(
+      _bookSelectionCubit,
+      buildWhen: (s) => [
+        BookSelectionInitial,
+        BookSelectionLoading,
+        BookSelectionLoadingError,
+        BookSelectionBooksLoaded,
+        BookSelectionSelected,
+      ].contains(s.runtimeType),
+    );
 
     switch (state) {
       case BookSelectionSelected(:final url):
@@ -64,7 +79,7 @@ class BookSelection extends HookWidget {
       case BookSelectionInitial() || BookSelectionLoading():
         return const Center(child: CircularProgressIndicator());
 
-      case BookSelectionError(:final errorCode, :final errorContext):
+      case BookSelectionLoadingError(:final errorCode, :final errorContext):
         return Center(
           child: Column(
             children: [
@@ -91,6 +106,8 @@ class BookSelection extends HookWidget {
               )
               .toList(),
         );
+      case _:
+        return Center(child: Text('bookSelection.error.unexpectedState'.tr()));
     }
   }
 }

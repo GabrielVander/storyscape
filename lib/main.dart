@@ -17,6 +17,7 @@ import 'package:storyscape/features/new_book/ui/widgets/new_book_modal.dart';
 import 'package:storyscape/features/read_book/ui/cubit/book_reader_cubit.dart';
 import 'package:storyscape/features/select_book/data/repositories/available_book_repository_impl.dart';
 import 'package:storyscape/features/select_book/domain/repositories/available_book_repository.dart';
+import 'package:storyscape/features/select_book/domain/usecases/check_available_books_change.dart';
 import 'package:storyscape/features/select_book/domain/usecases/retrieve_available_books.dart';
 import 'package:storyscape/features/select_book/ui/cubit/book_selection_cubit.dart';
 import 'package:storyscape/storyscape.dart';
@@ -98,7 +99,13 @@ void _setUpSelectBookInjections(GetIt locator) {
   locator
     ..registerLazySingleton<AvailableBookRepository>(() => AvailableBookRepositoryImpl(isarDataSource: locator.get()))
     ..registerLazySingleton<RetrieveStoredBooks>(() => RetrieveStoredBooksImpl(availableBookRepository: locator.get()))
+    ..registerLazySingleton<CheckAvailableBooksChange>(
+      () => CheckAvailableBooksChangeImpl(availableBookRepository: locator.get()),
+    )
     ..registerLazySingleton<BookSelectionCubit>(
-      () => BookSelectionCubit(retrieveStoredBooks: locator.get()),
+      () => BookSelectionCubit(
+        retrieveStoredBooksUseCase: locator.get(),
+        checkAvailableBooksChangeUseCase: locator.get(),
+      ),
     );
 }

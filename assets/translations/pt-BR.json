@@ -8,7 +8,12 @@
     }
   },
   "bookSelection": {
-    "pageTitle": "Abrir livro"
+    "pageTitle": "Abrir livro",
+    "error": {
+      "genericErrorMessage": "Algo deu errado",
+      "unableToUpdateBooks": "Não foi possível atualizar livros",
+      "unexpectedState": "Estado de UI não esperado"
+    }
   },
   "newBook": {
     "urlBookFailure": "Não foi possível carregar livro via URL",

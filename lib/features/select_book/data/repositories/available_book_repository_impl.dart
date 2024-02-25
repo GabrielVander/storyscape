@@ -1,5 +1,5 @@
 import 'package:rust_core/result.dart';
-import 'package:rust_core/src/typedefs/unit.dart';
+import 'package:rust_core/typedefs.dart';
 import 'package:storyscape/core/logging/storyscape_logger.dart';
 import 'package:storyscape/core/logging/storyscape_logger_factory.dart';
 import 'package:storyscape/features/book_storage/data/data_sources/local/book_isar_data_source.dart';

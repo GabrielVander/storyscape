@@ -10,7 +10,9 @@
   "bookSelection": {
     "pageTitle": "Open book",
     "error": {
-      "genericErrorMessage": "Something went wrong"
+      "genericErrorMessage": "Something went wrong",
+      "unableToUpdateBooks": "Unable to update books",
+      "unexpectedState": "Unexpected UI state"
     }
   },
   "newBook": {
