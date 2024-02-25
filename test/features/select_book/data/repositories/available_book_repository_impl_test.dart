@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rust_core/result.dart';
+import 'package:rust_core/typedefs.dart';
 import 'package:storyscape/features/book_storage/data/data_sources/local/book_isar_data_source.dart';
 import 'package:storyscape/features/book_storage/data/data_sources/local/models/local_book_isar_model.dart';
 import 'package:storyscape/features/select_book/data/repositories/available_book_repository_impl.dart';
@@ -55,6 +58,32 @@ void main() {
         AvailableBook(url: 'bae3a379-cf80-41d7-b4ad-b892acf00a1b'),
       ]),
     );
+  });
+
+  test('should return Err if unable to watch Isar local book collection when notifying on available books change', () {
+    when(() => isarDataSource.watchLazyAllBooks()).thenReturn(const Err('BKLSA8s'));
+
+    final Result<Stream<Unit>, String> result = repository.onAvaliableBooksChange();
+
+    expect(result, const Err<dynamic, String>('Unable to watch book changes'));
+  });
+
+  test('should return Ok when notifying on available books change', () {
+    final StreamController<Unit> streamController = StreamController<Unit>();
+
+    when(() => isarDataSource.watchLazyAllBooks()).thenReturn(Ok(streamController.stream));
+
+    final Result<Stream<Unit>, String> result = repository.onAvaliableBooksChange();
+
+    expectLater(
+      result.unwrap(),
+      emitsInOrder([(), (), ()]),
+    );
+
+    streamController
+      ..add(())
+      ..add(())
+      ..add(());
   });
 }
 

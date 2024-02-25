@@ -1,4 +1,5 @@
 import 'package:rust_core/result.dart';
+import 'package:rust_core/src/typedefs/unit.dart';
 import 'package:storyscape/core/logging/storyscape_logger.dart';
 import 'package:storyscape/core/logging/storyscape_logger_factory.dart';
 import 'package:storyscape/features/book_storage/data/data_sources/local/book_isar_data_source.dart';
@@ -28,4 +29,12 @@ class AvailableBookRepositoryImpl implements AvailableBookRepository {
 
   FutureResult<List<LocalBookIsarModel>, String> _fetchAllBooksFromIsar() =>
       _isarDataSource.getAllBooks().inspectErr(_logger.warn);
+
+  @override
+  Result<Stream<Unit>, String> onAvaliableBooksChange() => const Ok(())
+      .inspect((_) => _logger.debug('Setting up books change notification stream...'))
+      .andThen((_) => _watchLazyAllBooks())
+      .mapErr((_) => 'Unable to watch book changes');
+
+  Result<Stream<Unit>, String> _watchLazyAllBooks() => _isarDataSource.watchLazyAllBooks().inspectErr(_logger.warn);
 }
