@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:isar/isar.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rust_core/src/result/result.dart';
+import 'package:rust_core/typedefs.dart';
 import 'package:storyscape/features/book_storage/data/data_sources/local/book_isar_data_source.dart';
 import 'package:storyscape/features/book_storage/data/data_sources/local/models/local_book_isar_model.dart';
 
@@ -80,5 +82,21 @@ void main() {
             .having((m) => m.url, 'url', 'e47d18a0-c4e0-4647-b423-edfc4738c5db'),
       ]),
     );
+  });
+
+  test('should return Ok with expected books when watching all books', () async {
+    await dataSource.upsertBook(const LocalBookIsarModel(id: null, url: 'eefd65d5-ff77-4aa0-8ab6-24fa5a4b17a6'));
+    await dataSource.upsertBook(const LocalBookIsarModel(id: null, url: '4df9abd6-47d8-45fe-b38b-5308c9b74ac0'));
+    await dataSource.upsertBook(const LocalBookIsarModel(id: null, url: 'e47d18a0-c4e0-4647-b423-edfc4738c5db'));
+
+    final Result<Stream<Unit>, String> result = dataSource.watchLazyAllBooks();
+
+    expect(result.isOk(), true, reason: result.unwrap().toString());
+
+    unawaited(expectLater(result.unwrap(), emitsInOrder([(), (), ()])));
+
+    await dataSource.upsertBook(const LocalBookIsarModel(id: null, url: 'eefd65d5-ff77-4aa0-8ab6-24fa5a4b17a6'));
+    await dataSource.upsertBook(const LocalBookIsarModel(id: null, url: '4df9abd6-47d8-45fe-b38b-5308c9b74ac0'));
+    await dataSource.upsertBook(const LocalBookIsarModel(id: null, url: 'e47d18a0-c4e0-4647-b423-edfc4738c5db'));
   });
 }
