@@ -8,7 +8,11 @@
     }
   },
   "bookSelection": {
-    "pageTitle": "Abrir livro",
-    "urlFieldLabel": "URL do livro"
+    "pageTitle": "Abrir livro"
+  },
+  "newBook": {
+    "urlBookFailure": "Não foi possível carregar livro via URL",
+    "urlFieldLabel": "URL do livro",
+    "bookSavedSuccessfully": "Livro salvo com sucesso"
   }
 }

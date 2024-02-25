@@ -16,7 +16,7 @@ class BookUrlField extends HookWidget {
       onEditingComplete: () => onFinished(controller.value.text),
       keyboardType: TextInputType.url,
       decoration: InputDecoration(
-        labelText: 'bookSelection.urlFieldLabel'.tr(),
+        labelText: 'newBook.urlFieldLabel'.tr(),
         suffixIcon:
             IconButton(onPressed: () => onFinished(controller.value.text), icon: const Icon(Icons.arrow_forward)),
       ),

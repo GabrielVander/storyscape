@@ -10,7 +10,11 @@ class NewBookModal {
   void display(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
-      builder: (context) => NewBookByUrlBottomSheet(newBookCubit: _newBookCubit),
+      isDismissible: false,
+      builder: (context) => NewBookByUrlBottomSheet(
+        newBookCubit: _newBookCubit,
+        onClosing: () => Navigator.pop(context),
+      ),
       useSafeArea: true,
     );
   }

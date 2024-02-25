@@ -19,6 +19,11 @@ class NewBookError extends NewBookState {
   List<Object> get props => [];
 }
 
+class NewBookSaved extends NewBookState {
+  @override
+  List<Object> get props => [];
+}
+
 class NewBookDownloading extends NewBookState {
   const NewBookDownloading({required this.percentageDisplay, required this.percentageValue});
 

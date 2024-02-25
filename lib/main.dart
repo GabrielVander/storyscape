@@ -99,6 +99,6 @@ void _setUpSelectBookInjections(GetIt locator) {
     ..registerLazySingleton<AvailableBookRepository>(() => AvailableBookRepositoryImpl(isarDataSource: locator.get()))
     ..registerLazySingleton<RetrieveStoredBooks>(() => RetrieveStoredBooksImpl(availableBookRepository: locator.get()))
     ..registerLazySingleton<BookSelectionCubit>(
-      () => BookSelectionCubit(storeNewBookUseCase: locator.get<StoreNewBook>(), retrieveStoredBooks: locator.get()),
+      () => BookSelectionCubit(retrieveStoredBooks: locator.get()),
     );
 }

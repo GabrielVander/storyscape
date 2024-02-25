@@ -6,9 +6,12 @@ import 'package:storyscape/features/new_book/ui/cubit/new_book_cubit.dart';
 import 'package:storyscape/features/new_book/ui/widgets/book_url_field.dart';
 
 class NewBookByUrlBottomSheet extends HookWidget {
-  const NewBookByUrlBottomSheet({required NewBookCubit newBookCubit, super.key}) : _newBookCubit = newBookCubit;
+  const NewBookByUrlBottomSheet({required void Function() onClosing, required NewBookCubit newBookCubit, super.key})
+      : _newBookCubit = newBookCubit,
+        _onClosing = onClosing;
 
   final NewBookCubit _newBookCubit;
+  final void Function() _onClosing;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +19,10 @@ class NewBookByUrlBottomSheet extends HookWidget {
         useAnimationController(duration: const Duration(milliseconds: 200));
 
     return BottomSheet(
-      onClosing: _newBookCubit.reset,
+      onClosing: () {
+        _onClosing();
+        _newBookCubit.reset();
+      },
       animationController: bottomSheetAnimationController,
       showDragHandle: true,
       builder: (BuildContext context) => _BottomSheetBody(newBookCubit: _newBookCubit),
@@ -25,7 +31,7 @@ class NewBookByUrlBottomSheet extends HookWidget {
 }
 
 class _BottomSheetBody extends HookWidget {
-  const _BottomSheetBody({required NewBookCubit newBookCubit, super.key}) : _newBookCubit = newBookCubit;
+  const _BottomSheetBody({required NewBookCubit newBookCubit}) : _newBookCubit = newBookCubit;
   final NewBookCubit _newBookCubit;
 
   @override
@@ -37,11 +43,13 @@ class _BottomSheetBody extends HookWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 15),
           child: BookUrlField(
-            onFinished: _newBookCubit.downloadBookByUrl,
+            onFinished: _newBookCubit.addNewBookByUrl,
           ),
         );
       case NewBookLoading():
         return const Center(child: CircularProgressIndicator());
+      case NewBookSaved():
+        return Center(child: Text('newBook.bookSavedSuccessfully'.tr()));
       case NewBookError():
         return Center(child: Text('newBook.urlBookFailure'.tr()));
       case NewBookDownloading(:final percentageDisplay, :final percentageValue):
