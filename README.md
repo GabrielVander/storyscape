@@ -37,6 +37,7 @@ platform that is both user-friendly and customizable for readers worldwide.
 - At present, Storyscape offers the ability to display an ePub book downloaded through a user-provided
 URL. This allows users to easily access their favorite books on any device with an internet
 connection.
+- Successfully loaded ePub books are stored locally
 
 ## Development
 
