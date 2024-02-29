@@ -2,23 +2,27 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rust_core/result.dart';
-import 'package:storyscape/features/new_book/domain/entities/existing_book.dart';
+import 'package:rust_core/typedefs.dart';
 import 'package:storyscape/features/new_book/domain/entities/new_book.dart';
-import 'package:storyscape/features/new_book/domain/entities/stored_book.dart';
-import 'package:storyscape/features/new_book/domain/use_cases/retrieve_stored_books.dart';
-import 'package:storyscape/features/new_book/domain/use_cases/store_new_book.dart';
+import 'package:storyscape/features/select_book/domain/entities/available_book.dart';
+import 'package:storyscape/features/select_book/domain/usecases/check_available_books_change.dart';
+import 'package:storyscape/features/select_book/domain/usecases/retrieve_available_books.dart';
 import 'package:storyscape/features/select_book/ui/cubit/book_selection_cubit.dart';
 
 void main() {
-  late StoreNewBook storeNewBookUseCase;
   late RetrieveStoredBooks retrieveStoredBooks;
+  late CheckAvailableBooksChange checkAvailableBooksChange;
+
   late BookSelectionCubit cubit;
 
   setUp(() {
-    storeNewBookUseCase = _MockStoreNewBook();
     retrieveStoredBooks = _MockRetrieveStoredBooks();
+    checkAvailableBooksChange = _MockCheckAvailableBooksChange();
 
-    cubit = BookSelectionCubit(storeNewBookUseCase: storeNewBookUseCase, retrieveStoredBooks: retrieveStoredBooks);
+    cubit = BookSelectionCubit(
+      retrieveStoredBooksUseCase: retrieveStoredBooks,
+      checkAvailableBooksChangeUseCase: checkAvailableBooksChange,
+    );
 
     registerFallbackValue(_MockNewBook());
   });
@@ -26,42 +30,6 @@ void main() {
   tearDown(resetMocktailState);
 
   test('should emit initial state', () => expect(cubit.state, BookSelectionInitial()));
-
-  blocTest<BookSelectionCubit, BookSelectionState>(
-    'should emit loading state when selecting book url',
-    build: () => cubit,
-    setUp: () => when(() => storeNewBookUseCase.execute(any())).thenAnswer((_) async => const Err('if4iL8dbK')),
-    act: (cubit) => cubit.selectBookUrl('f581f8f5-54e0-4b88-875e-7bd3856c967c'),
-    expect: () => containsAllInOrder([BookSelectionLoading()]),
-  );
-
-  blocTest<BookSelectionCubit, BookSelectionState>(
-    'should emit err state if book storing operation fails when selecting book url',
-    build: () => cubit,
-    setUp: () => when(() => storeNewBookUseCase.execute(any())).thenAnswer((_) async => const Err('TZrSiHqR6')),
-    act: (cubit) => cubit.selectBookUrl('f581f8f5-54e0-4b88-875e-7bd3856c967c'),
-    skip: 1,
-    expect: () => [
-      BookSelectionError(
-        errorCode: BookSelectionErrorCode.unableToSelectBookByUrl.name,
-        errorContext: 'TZrSiHqR6',
-      ),
-    ],
-    verify: (_) =>
-        verify(() => storeNewBookUseCase.execute(const NewBook(url: 'f581f8f5-54e0-4b88-875e-7bd3856c967c'))).called(1),
-  );
-
-  blocTest<BookSelectionCubit, BookSelectionState>(
-    'should emit selected state if book storing operation succeeds when selecting book url',
-    build: () => cubit,
-    setUp: () => when(() => storeNewBookUseCase.execute(any()))
-        .thenAnswer((_) async => const Ok(ExistingBook(id: 264, url: 'a8938035-7de0-45a0-bf26-01110e1a9a01'))),
-    act: (cubit) => cubit.selectBookUrl('836945f1-1d12-419c-a736-69db139a6e62'),
-    skip: 1,
-    expect: () => [const BookSelectionSelected(url: 'a8938035-7de0-45a0-bf26-01110e1a9a01')],
-    verify: (_) =>
-        verify(() => storeNewBookUseCase.execute(const NewBook(url: '836945f1-1d12-419c-a736-69db139a6e62'))).called(1),
-  );
 
   blocTest<BookSelectionCubit, BookSelectionState>(
     'should emit loading state when loading stored books',
@@ -78,7 +46,7 @@ void main() {
     act: (cubit) => cubit.loadStoredBooks(),
     skip: 1,
     expect: () => [
-      BookSelectionError(
+      BookSelectionLoadingError(
         errorCode: BookSelectionErrorCode.unableToLoadStoredBooks.name,
         errorContext: 'AEMUHhSVT2Z',
       ),
@@ -89,28 +57,103 @@ void main() {
   blocTest<BookSelectionCubit, BookSelectionState>(
     'should emit loaded state if book retrieval operation succeeds when loading stored books',
     build: () => cubit,
-    setUp: () => when(() => retrieveStoredBooks.call()).thenAnswer(
-      (_) async => Ok([
-        StoredBook(url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-        StoredBook(url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
-      ]),
-    ),
+    setUp: () {
+      when(() => retrieveStoredBooks.call()).thenAnswer(
+        (_) async => Ok([
+          AvailableBook(id: 962, title: 'NI1UI3tvG', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+          AvailableBook(id: 753, title: 'Bj0UXzh', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+        ]),
+      );
+      when(() => checkAvailableBooksChange.call()).thenReturn(const Err('T1KwTc6'));
+    },
     act: (cubit) => cubit.loadStoredBooks(),
     skip: 1,
     expect: () => [
       BookSelectionBooksLoaded(
         books: [
-          BookSelectionViewModel(displayName: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          BookSelectionViewModel(displayName: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          BookSelectionViewModel(id: 962, displayName: 'NI1UI3tvG'),
+          BookSelectionViewModel(id: 753, displayName: 'Bj0UXzh'),
         ],
       ),
     ],
     verify: (_) => verify(() => retrieveStoredBooks()).called(1),
   );
+
+  blocTest<BookSelectionCubit, BookSelectionState>(
+    'should emit loaded state on change when loading stored books',
+    build: () => cubit,
+    setUp: () {
+      when(() => retrieveStoredBooks.call()).thenAnswer(
+        (_) async => Ok([
+          AvailableBook(id: 4, title: '3TeFsLuUlMp', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+          AvailableBook(id: 531, title: '3S3tJMiY2MV', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+        ]),
+      );
+
+      when(() => checkAvailableBooksChange.call()).thenReturn(Ok(Stream<Unit>.fromIterable([(), ()])));
+    },
+    act: (cubit) async => cubit.loadStoredBooks(),
+    skip: 1,
+    expect: () => [
+      BookSelectionBooksLoaded(
+        books: [
+          BookSelectionViewModel(id: 4, displayName: '3TeFsLuUlMp'),
+          BookSelectionViewModel(id: 531, displayName: '3S3tJMiY2MV'),
+        ],
+      ),
+    ],
+    verify: (_) {
+      verify(() => retrieveStoredBooks()).called(3);
+      verify(() => checkAvailableBooksChange()).called(1);
+    },
+  );
+
+  blocTest<BookSelectionCubit, BookSelectionState>(
+    'should emit loading state when opening book',
+    build: () => cubit,
+    setUp: () {
+      when(() => retrieveStoredBooks.call()).thenAnswer(
+        (_) async => Ok([
+          AvailableBook(id: 97, title: 'bYpSoUDCEF', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+          AvailableBook(id: 497, title: 'r0acGty', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+        ]),
+      );
+
+      when(() => checkAvailableBooksChange.call()).thenReturn(Ok(Stream<Unit>.fromIterable([(), ()])));
+    },
+    act: (cubit) async {
+      await cubit.loadStoredBooks();
+      await cubit.open(BookSelectionViewModel(id: 97, displayName: '0598b842-3781-4daa-8a4a-c9001f219ada'));
+    },
+    skip: 2,
+    expect: () => [BookSelectionLoading(), anything, anything, anything],
+  );
+
+  blocTest<BookSelectionCubit, BookSelectionState>(
+    'should emit selected state when opening book',
+    build: () => cubit,
+    setUp: () {
+      when(() => retrieveStoredBooks.call()).thenAnswer(
+        (_) async => Ok([
+          AvailableBook(id: 447, title: 'cKjPqCd1hDA', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+          AvailableBook(id: 234, title: 'CG5wyq72q0', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+        ]),
+      );
+
+      when(() => checkAvailableBooksChange.call()).thenReturn(Ok(Stream<Unit>.fromIterable([(), ()])));
+    },
+    act: (cubit) async {
+      await cubit.loadStoredBooks();
+      await cubit.open(BookSelectionViewModel(id: 234, displayName: 'ef0ba65d-f281-4b5e-a7cf-164171627918'));
+    },
+    skip: 3,
+    expect: () =>
+        [const BookSelectionSelected(url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'), BookSelectionInitial(), anything],
+  );
 }
 
-class _MockStoreNewBook extends Mock implements StoreNewBook {}
-
 class _MockRetrieveStoredBooks extends Mock implements RetrieveStoredBooks {}
+
+class _MockCheckAvailableBooksChange extends Mock implements CheckAvailableBooksChange {}
 
 class _MockNewBook extends Mock implements NewBook {}

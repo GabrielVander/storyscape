@@ -3,38 +3,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooked_bloc/hooked_bloc.dart';
 import 'package:storyscape/core/routing/routes.dart';
+import 'package:storyscape/features/new_book/ui/widgets/new_book_modal.dart';
 import 'package:storyscape/features/select_book/ui/cubit/book_selection_cubit.dart';
-import 'package:storyscape/features/select_book/ui/widgets/book_url_field.dart';
 
 class BookSelectionPage extends HookWidget {
-  const BookSelectionPage({required BookSelectionCubit bookSelectionCubit, super.key})
-      : _bookSelectionCubit = bookSelectionCubit;
+  const BookSelectionPage({
+    required BookSelectionCubit bookSelectionCubit,
+    required NewBookModal newBookModal,
+    super.key,
+  })  : _bookSelectionCubit = bookSelectionCubit,
+        _newBookModal = newBookModal;
 
   final BookSelectionCubit _bookSelectionCubit;
+  final NewBookModal _newBookModal;
 
   @override
   Widget build(BuildContext context) {
-    final AnimationController bottomSheetAnimationController =
-        useAnimationController(duration: const Duration(milliseconds: 200));
-
     return Scaffold(
       appBar: AppBar(
         title: Text('bookSelection.pageTitle'.tr()),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet<void>(
-            context: context,
-            builder: (context) => BottomSheet(
-              onClosing: () {},
-              animationController: bottomSheetAnimationController,
-              showDragHandle: true,
-              builder: (BuildContext context) => _AddBookByUrl(
-                bookSelectionCubit: _bookSelectionCubit,
-              ),
-            ),
-          );
-        },
+        onPressed: () => _newBookModal.display(context),
         child: const Icon(Icons.add),
       ),
       body: Padding(
@@ -55,26 +45,51 @@ class BookSelection extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    useBlocListener(
+      _bookSelectionCubit,
+      (_, __, context) => ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('bookSelection.error.unableToUpdateBooks'.tr()))),
+      listenWhen: (s) => s is BookSelectionUpdateError,
+    );
+
+    useBlocListener(
+      _bookSelectionCubit,
+      (_, current, context) {
+        if (current case BookSelectionSelected(:final url)) {
+          WidgetsBinding.instance.addPostFrameCallback((_) => BookReadingRoute(url: url).push<void>(context));
+        }
+      },
+      listenWhen: (s) => s is BookSelectionSelected,
+    );
+
+    final BookSelectionState state = useBlocBuilder(
+      _bookSelectionCubit,
+      buildWhen: (s) => [
+        BookSelectionInitial,
+        BookSelectionLoading,
+        BookSelectionLoadingError,
+        BookSelectionBooksLoaded,
+      ].contains(s.runtimeType),
+    );
+    final bool shouldUpdate = state is BookSelectionInitial;
+
     useEffect(
       () {
         _bookSelectionCubit.loadStoredBooks();
 
         return null;
       },
-      [],
+      [shouldUpdate],
     );
 
-    final BookSelectionState state = useBlocBuilder(_bookSelectionCubit);
-
     switch (state) {
-      case BookSelectionSelected(:final url):
-        BookReadingRoute(url: url).push<void>(context);
-        return const Center(child: CircularProgressIndicator());
-
       case BookSelectionInitial() || BookSelectionLoading():
+        if (state is BookSelectionInitial) {
+          WidgetsBinding.instance.addPostFrameCallback((_) => _bookSelectionCubit.loadStoredBooks());
+        }
         return const Center(child: CircularProgressIndicator());
 
-      case BookSelectionError(:final errorCode, :final errorContext):
+      case BookSelectionLoadingError(:final errorCode, :final errorContext):
         return Center(
           child: Column(
             children: [
@@ -89,34 +104,37 @@ class BookSelection extends HookWidget {
           crossAxisCount: 2,
           children: books
               .map(
-                (book) => Card.outlined(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const FlutterLogo(size: 72),
-                      Text(book.displayName),
-                    ],
+                (book) => GestureDetector(
+                  onTap: () => _bookSelectionCubit.open(book),
+                  child: Card.outlined(
+                    key: ValueKey<int>(book.id),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const FlutterLogo(size: 72),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                book.displayName ?? 'bookSelection.error.noDisplayName'.tr(),
+                                softWrap: true,
+                                maxLines: 3,
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               )
               .toList(),
         );
+      case _:
+        return Center(child: Text('bookSelection.error.unexpectedState'.tr()));
     }
-  }
-}
-
-class _AddBookByUrl extends HookWidget {
-  const _AddBookByUrl({required this.bookSelectionCubit});
-
-  final BookSelectionCubit bookSelectionCubit;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(15),
-      child: BookUrlField(
-        onFinished: bookSelectionCubit.selectBookUrl,
-      ),
-    );
   }
 }

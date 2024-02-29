@@ -14,14 +14,21 @@ class BookSelectionLoading extends BookSelectionState {
   List<Object> get props => [];
 }
 
-class BookSelectionError extends BookSelectionState {
-  const BookSelectionError({required this.errorCode, required this.errorContext});
+class BookSelectionLoadingError extends BookSelectionState {
+  const BookSelectionLoadingError({required this.errorCode, required this.errorContext});
 
   final String errorCode;
   final String? errorContext;
 
   @override
   List<Object?> get props => [errorCode, errorContext];
+}
+
+class BookSelectionUpdateError extends BookSelectionState {
+  const BookSelectionUpdateError();
+
+  @override
+  List<Object?> get props => [];
 }
 
 class BookSelectionSelected extends BookSelectionState {
@@ -43,16 +50,23 @@ class BookSelectionBooksLoaded extends BookSelectionState {
 }
 
 class BookSelectionViewModel with EquatableMixin {
-  BookSelectionViewModel({required this.displayName});
+  BookSelectionViewModel({required this.id, required this.displayName});
 
-  final String displayName;
-
-  BookSelectionViewModel copyWith({String? displayName}) =>
-      BookSelectionViewModel(displayName: displayName ?? this.displayName);
+  final int id;
+  final String? displayName;
 
   @override
-  List<Object> get props => [displayName];
+  List<Object?> get props => [id, displayName];
 
   @override
-  String toString() => 'BookSelectionViewModel{displayName: $displayName}';
+  String toString() => 'BookSelectionViewModel{id: $id, displayName: $displayName}';
+
+  BookSelectionViewModel copyWith({
+    int? id,
+    String? displayName,
+  }) =>
+      BookSelectionViewModel(
+        id: id ?? this.id,
+        displayName: displayName ?? this.displayName,
+      );
 }

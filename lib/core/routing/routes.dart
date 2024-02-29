@@ -33,6 +33,7 @@ class BookSelectionRoute extends GoRouteData {
   Widget build(BuildContext context, GoRouterState state) {
     return BookSelectionPage(
       bookSelectionCubit: _locator.get<BookSelectionCubit>(),
+      newBookModal: _locator.get(),
     );
   }
 }

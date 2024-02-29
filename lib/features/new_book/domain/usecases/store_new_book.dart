@@ -1,12 +1,12 @@
 import 'package:rust_core/result.dart';
+import 'package:rust_core/typedefs.dart';
 import 'package:storyscape/core/logging/storyscape_logger.dart';
 import 'package:storyscape/core/logging/storyscape_logger_factory.dart';
-import 'package:storyscape/features/new_book/domain/entities/existing_book.dart';
 import 'package:storyscape/features/new_book/domain/entities/new_book.dart';
 import 'package:storyscape/features/new_book/domain/repositories/book_repository.dart';
 
 abstract interface class StoreNewBook {
-  Future<Result<ExistingBook, String>> execute(NewBook book);
+  Future<Result<Unit, String>> execute(NewBook book);
 }
 
 class StoreNewBookImpl implements StoreNewBook {
@@ -16,7 +16,7 @@ class StoreNewBookImpl implements StoreNewBook {
   final BookRepository _bookRepository;
 
   @override
-  Future<Result<ExistingBook, String>> execute(NewBook book) async {
+  Future<Result<Unit, String>> execute(NewBook book) async {
     _logger.info('Storing new book...');
 
     return _bookRepository

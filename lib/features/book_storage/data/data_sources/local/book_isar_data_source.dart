@@ -5,7 +5,7 @@ import 'package:rust_core/result.dart';
 import 'package:rust_core/typedefs.dart';
 import 'package:storyscape/core/logging/storyscape_logger.dart';
 import 'package:storyscape/core/logging/storyscape_logger_factory.dart';
-import 'package:storyscape/features/new_book/data/data_sources/local/models/local_book_isar_model.dart';
+import 'package:storyscape/features/book_storage/data/data_sources/local/models/local_book_isar_model.dart';
 
 abstract interface class BookIsarDataSource {
   Future<Result<int, String>> upsertBook(LocalBookIsarModel model);
@@ -13,6 +13,8 @@ abstract interface class BookIsarDataSource {
   Future<Result<LocalBookIsarModel, String>> getBookById(Id id);
 
   Future<Result<List<LocalBookIsarModel>, String>> getAllBooks();
+
+  Result<Stream<Unit>, String> watchLazyAllBooks();
 }
 
 class BookIsarDataSourceImpl implements BookIsarDataSource {
@@ -46,5 +48,27 @@ class BookIsarDataSourceImpl implements BookIsarDataSource {
 
     return Ok<List<LocalBookIsarModel>, String>(await _isar.collection<LocalBookIsarModel>().where().findAll())
         .inspect((models) => _logger.debug('Found ${models.length} models'));
+  }
+
+  @override
+  Result<Stream<Unit>, String> watchLazyAllBooks() => const Ok(())
+      .inspect((_) => _logger.debug('Lazily watching all books...'))
+      .andThen((_) => _getChangeNotificationStream())
+      .inspect((stream) => stream.listen((_) => _logger.debug('Local Isar Book collection changed')))
+      .mapErr((_) => 'Unable to watch books');
+
+  Result<Stream<Unit>, String> _getChangeNotificationStream() => const Ok(())
+      .andThen((_) => _watchLazyIsarCollection())
+      .map((stream) => stream.map((_) => ()).asBroadcastStream())
+      .mapErr((e) => 'Unable to watch Isar collection')
+      .inspectErr(_logger.warn);
+
+  Result<Stream<void>, Exception> _watchLazyIsarCollection() {
+    try {
+      return Ok(_isar.collection<LocalBookIsarModel>().watchLazy());
+    } on Exception catch (exception, stackTrace) {
+      _logger.error(exception.toString(), error: exception, stackTrace: stackTrace);
+      return Err(exception);
+    }
   }
 }

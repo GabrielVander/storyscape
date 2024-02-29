@@ -6,13 +6,19 @@ import 'package:get_it/get_it.dart';
 import 'package:internet_file/internet_file.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:storyscape/features/new_book/data/data_sources/local/book_isar_data_source.dart';
-import 'package:storyscape/features/new_book/data/data_sources/local/models/local_book_isar_model.dart';
+import 'package:storyscape/features/book_storage/data/data_sources/local/book_isar_data_source.dart';
+import 'package:storyscape/features/book_storage/data/data_sources/local/models/local_book_isar_model.dart';
 import 'package:storyscape/features/new_book/data/repositories/book_repository_impl.dart';
 import 'package:storyscape/features/new_book/domain/repositories/book_repository.dart';
-import 'package:storyscape/features/new_book/domain/use_cases/retrieve_stored_books.dart';
-import 'package:storyscape/features/new_book/domain/use_cases/store_new_book.dart';
+import 'package:storyscape/features/new_book/domain/usecases/download_epub_book_by_url.dart';
+import 'package:storyscape/features/new_book/domain/usecases/store_new_book.dart';
+import 'package:storyscape/features/new_book/ui/cubit/new_book_cubit.dart';
+import 'package:storyscape/features/new_book/ui/widgets/new_book_modal.dart';
 import 'package:storyscape/features/read_book/ui/cubit/book_reader_cubit.dart';
+import 'package:storyscape/features/select_book/data/repositories/available_book_repository_impl.dart';
+import 'package:storyscape/features/select_book/domain/repositories/available_book_repository.dart';
+import 'package:storyscape/features/select_book/domain/usecases/check_available_books_change.dart';
+import 'package:storyscape/features/select_book/domain/usecases/retrieve_available_books.dart';
 import 'package:storyscape/features/select_book/ui/cubit/book_selection_cubit.dart';
 import 'package:storyscape/storyscape.dart';
 
@@ -36,9 +42,10 @@ Future<void> _setUpInjections() async {
   final GetIt locator = GetIt.I;
 
   await _setUpLibraryInjections(locator);
-  _setUpBookReadingInjections(locator);
+  _setUpReadBookInjections(locator);
   _setUpBookStorageInjections(locator);
-  _setUpBookSelectionInjections(locator);
+  _setUpNewBookInjections(locator);
+  _setUpSelectBookInjections(locator);
 }
 
 Future<void> _setUpLibraryInjections(GetIt locator) async {
@@ -51,7 +58,7 @@ Future<void> _setUpLibraryInjections(GetIt locator) async {
   locator.registerSingleton<Isar>(isarInstance);
 }
 
-void _setUpBookReadingInjections(GetIt locator) {
+void _setUpReadBookInjections(GetIt locator) {
   locator.registerSingleton<BookReaderCubit>(
     BookReaderCubit(
       networkFileRetriever: (String url, void Function(double) progressUpdater) async => InternetFile.get(
@@ -69,20 +76,36 @@ void _setUpBookStorageInjections(GetIt locator) {
         isar: locator.get<Isar>(),
       ),
     )
-    ..registerLazySingleton<LocalBookIsarModelMapper>(LocalBookIsarModelMapperImpl.new)
+    ..registerLazySingleton<LocalBookIsarModelMapper>(LocalBookIsarModelMapperImpl.new);
+}
+
+void _setUpNewBookInjections(GetIt locator) {
+  locator
     ..registerLazySingleton<BookRepository>(
       () => BookRepositoryImpl(
         isarDataSource: locator.get<BookIsarDataSource>(),
         localBookIsarModelMapper: locator.get<LocalBookIsarModelMapper>(),
       ),
     )
-    ..registerLazySingleton<StoreNewBook>(() => StoreNewBookImpl(bookRepository: locator.get<BookRepository>()));
+    ..registerLazySingleton<DownloadEpubBookByUrl>(DownloadEpubBookUrlImpl.new)
+    ..registerLazySingleton<StoreNewBook>(() => StoreNewBookImpl(bookRepository: locator.get<BookRepository>()))
+    ..registerLazySingleton<NewBookCubit>(
+      () => NewBookCubit(downloadEpubBookByUrl: locator.get(), storeNewBook: locator.get()),
+    )
+    ..registerFactory<NewBookModal>(() => NewBookModal(newBookCubit: locator.get()));
 }
 
-void _setUpBookSelectionInjections(GetIt locator) {
+void _setUpSelectBookInjections(GetIt locator) {
   locator
-    ..registerLazySingleton<RetrieveStoredBooks>(() => RetrieveStoredBooksImpl(bookRepository: locator.get()))
+    ..registerLazySingleton<AvailableBookRepository>(() => AvailableBookRepositoryImpl(isarDataSource: locator.get()))
+    ..registerLazySingleton<RetrieveStoredBooks>(() => RetrieveStoredBooksImpl(availableBookRepository: locator.get()))
+    ..registerLazySingleton<CheckAvailableBooksChange>(
+      () => CheckAvailableBooksChangeImpl(availableBookRepository: locator.get()),
+    )
     ..registerLazySingleton<BookSelectionCubit>(
-      () => BookSelectionCubit(storeNewBookUseCase: locator.get<StoreNewBook>(), retrieveStoredBooks: locator.get()),
+      () => BookSelectionCubit(
+        retrieveStoredBooksUseCase: locator.get(),
+        checkAvailableBooksChangeUseCase: locator.get(),
+      ),
     );
 }
