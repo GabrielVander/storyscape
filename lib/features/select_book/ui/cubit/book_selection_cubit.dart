@@ -62,14 +62,14 @@ class BookSelectionCubit extends Cubit<BookSelectionState> {
 
   BookSelectionViewModel _parseBook(AvailableBook e) => BookSelectionViewModel(
         id: e.id,
-        displayName: e.url,
+        displayName: e.title,
       );
 
   Future<void> open(BookSelectionViewModel book) async {
     emit(BookSelectionLoading());
 
     _retrieveSelectedBook(book)
-        .inspect((ok) => emit(BookSelectionSelected(url: ok.url)))
+        .inspect((ok) => emit(BookSelectionSelected(url: ok.url!)))
         .inspectErr(
           (_) => emit(
             BookSelectionLoadingError(

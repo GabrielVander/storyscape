@@ -107,11 +107,25 @@ class BookSelection extends HookWidget {
                 (book) => GestureDetector(
                   onTap: () => _bookSelectionCubit.open(book),
                   child: Card.outlined(
+                    key: ValueKey<int>(book.id),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const FlutterLogo(size: 72),
-                        Text(book.displayName),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                book.displayName ?? 'bookSelection.error.noDisplayName'.tr(),
+                                softWrap: true,
+                                maxLines: 3,
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),

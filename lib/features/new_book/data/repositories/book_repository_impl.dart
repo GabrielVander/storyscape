@@ -1,4 +1,5 @@
 import 'package:rust_core/result.dart';
+import 'package:rust_core/typedefs.dart';
 import 'package:storyscape/core/logging/storyscape_logger.dart';
 import 'package:storyscape/core/logging/storyscape_logger_factory.dart';
 import 'package:storyscape/features/book_storage/data/data_sources/local/book_isar_data_source.dart';
@@ -19,26 +20,25 @@ class BookRepositoryImpl implements BookRepository {
   final LocalBookIsarModelMapper _localBookIsarModelMapper;
 
   @override
-  FutureResult<ExistingBook, String> storeNewBook(NewBook book) async => Future.value(Ok<NewBook, String>(book))
+  FutureResult<Unit, String> storeNewBook(NewBook book) async => Future.value(Ok<NewBook, String>(book))
       .inspect((_) => _logger.debug('Storing new book...'))
       .andThen(_storeBookLocally)
       .inspect((_) => _logger.debug('Book stored successfully'))
       .inspectErr(_logger.warn)
       .mapErr((_) => 'Unable to store new book');
 
-  FutureResult<ExistingBook, String> _storeBookLocally(NewBook book) => Future.value(Ok<NewBook, String>(book))
+  FutureResult<Unit, String> _storeBookLocally(NewBook book) => Future.value(Ok<NewBook, String>(book))
       .inspect((_) => _logger.debug('Storing book locally...'))
       .andThen(_storeLocalBookWithIsar)
       .inspect((_) => _logger.debug('Book stored locally successfully'))
       .inspectErr(_logger.warn)
       .mapErr((_) => 'Unable to store book locally');
 
-  FutureResult<ExistingBook, String> _storeLocalBookWithIsar(NewBook book) async =>
-      Future.value(Ok<NewBook, String>(book))
-          .andThen(_parseNewBookToIsarModel)
-          .andThen(_storeLocalBookIsarModel)
-          .map((id) => ExistingBook(id: id, url: book.url))
-          .inspectErr(_logger.warn);
+  FutureResult<Unit, String> _storeLocalBookWithIsar(NewBook book) async => Future.value(Ok<NewBook, String>(book))
+      .andThen(_parseNewBookToIsarModel)
+      .andThen(_storeLocalBookIsarModel)
+      .map((_) => ())
+      .inspectErr(_logger.warn);
 
   FutureResult<int, String> _storeLocalBookIsarModel(LocalBookIsarModel model) =>
       Future.value(Ok<LocalBookIsarModel, String>(model))

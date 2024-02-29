@@ -60,8 +60,8 @@ void main() {
     setUp: () {
       when(() => retrieveStoredBooks.call()).thenAnswer(
         (_) async => Ok([
-          AvailableBook(id: 962, url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          AvailableBook(id: 753, url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          AvailableBook(id: 962, title: 'NI1UI3tvG', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+          AvailableBook(id: 753, title: 'Bj0UXzh', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
         ]),
       );
       when(() => checkAvailableBooksChange.call()).thenReturn(const Err('T1KwTc6'));
@@ -71,8 +71,8 @@ void main() {
     expect: () => [
       BookSelectionBooksLoaded(
         books: [
-          BookSelectionViewModel(id: 962, displayName: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          BookSelectionViewModel(id: 753, displayName: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          BookSelectionViewModel(id: 962, displayName: 'NI1UI3tvG'),
+          BookSelectionViewModel(id: 753, displayName: 'Bj0UXzh'),
         ],
       ),
     ],
@@ -85,8 +85,8 @@ void main() {
     setUp: () {
       when(() => retrieveStoredBooks.call()).thenAnswer(
         (_) async => Ok([
-          AvailableBook(id: 4, url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          AvailableBook(id: 531, url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          AvailableBook(id: 4, title: '3TeFsLuUlMp', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+          AvailableBook(id: 531, title: '3S3tJMiY2MV', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
         ]),
       );
 
@@ -97,8 +97,8 @@ void main() {
     expect: () => [
       BookSelectionBooksLoaded(
         books: [
-          BookSelectionViewModel(id: 4, displayName: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          BookSelectionViewModel(id: 531, displayName: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          BookSelectionViewModel(id: 4, displayName: '3TeFsLuUlMp'),
+          BookSelectionViewModel(id: 531, displayName: '3S3tJMiY2MV'),
         ],
       ),
     ],
@@ -114,8 +114,8 @@ void main() {
     setUp: () {
       when(() => retrieveStoredBooks.call()).thenAnswer(
         (_) async => Ok([
-          AvailableBook(id: 97, url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          AvailableBook(id: 497, url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          AvailableBook(id: 97, title: 'bYpSoUDCEF', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+          AvailableBook(id: 497, title: 'r0acGty', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
         ]),
       );
 
@@ -135,8 +135,8 @@ void main() {
     setUp: () {
       when(() => retrieveStoredBooks.call()).thenAnswer(
         (_) async => Ok([
-          AvailableBook(id: 447, url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          AvailableBook(id: 234, url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          AvailableBook(id: 447, title: 'cKjPqCd1hDA', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+          AvailableBook(id: 234, title: 'CG5wyq72q0', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
         ]),
       );
 

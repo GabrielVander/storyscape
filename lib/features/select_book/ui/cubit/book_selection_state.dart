@@ -53,10 +53,10 @@ class BookSelectionViewModel with EquatableMixin {
   BookSelectionViewModel({required this.id, required this.displayName});
 
   final int id;
-  final String displayName;
+  final String? displayName;
 
   @override
-  List<Object> get props => [id, displayName];
+  List<Object?> get props => [id, displayName];
 
   @override
   String toString() => 'BookSelectionViewModel{id: $id, displayName: $displayName}';

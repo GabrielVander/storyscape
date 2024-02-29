@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rust_core/result.dart';
 import 'package:storyscape/features/new_book/domain/entities/book_downloader.dart';
-import 'package:storyscape/features/new_book/domain/entities/existing_book.dart';
 import 'package:storyscape/features/new_book/domain/entities/new_book.dart';
 import 'package:storyscape/features/new_book/domain/usecases/download_epub_book_by_url.dart';
 import 'package:storyscape/features/new_book/domain/usecases/store_new_book.dart';
@@ -52,29 +51,33 @@ void main() {
     'should emit err state if book storing operation fails when adding a new book by url',
     build: () => cubit,
     setUp: () {
-      when(() => downloadEpubBookByUrlUseCase.call(any(), any())).thenAnswer((_) async => Ok(_MockEpubBook()));
+      when(() => downloadEpubBookByUrlUseCase.call(any(), any()))
+          .thenAnswer((_) async => Ok(EpubBook()..Title = 'Q6KMDXPNJ'));
       when(() => storeNewBookUseCase.execute(any())).thenAnswer((_) async => const Err('TZrSiHqR6'));
     },
     act: (cubit) => cubit.addNewBookByUrl('f581f8f5-54e0-4b88-875e-7bd3856c967c'),
     skip: 1,
     expect: () => [NewBookError()],
-    verify: (_) =>
-        verify(() => storeNewBookUseCase.execute(const NewBook(url: 'f581f8f5-54e0-4b88-875e-7bd3856c967c'))).called(1),
+    verify: (_) => verify(
+      () => storeNewBookUseCase.execute(const NewBook(title: 'Q6KMDXPNJ', url: 'f581f8f5-54e0-4b88-875e-7bd3856c967c')),
+    ).called(1),
   );
 
   blocTest<NewBookCubit, NewBookState>(
     'should emit saved state if book storing operation succeeds when adding a new book by url',
     build: () => cubit,
     setUp: () {
-      when(() => downloadEpubBookByUrlUseCase.call(any(), any())).thenAnswer((_) async => Ok(_MockEpubBook()));
-      when(() => storeNewBookUseCase.execute(any()))
-          .thenAnswer((_) async => const Ok(ExistingBook(id: 264, url: 'a8938035-7de0-45a0-bf26-01110e1a9a01')));
+      when(() => downloadEpubBookByUrlUseCase.call(any(), any()))
+          .thenAnswer((_) async => Ok(EpubBook()..Title = 'vf6gU65bGf'));
+      when(() => storeNewBookUseCase.execute(any())).thenAnswer((_) async => const Ok(()));
     },
     act: (cubit) => cubit.addNewBookByUrl('836945f1-1d12-419c-a736-69db139a6e62'),
     skip: 1,
     expect: () => [NewBookSaved()],
-    verify: (_) =>
-        verify(() => storeNewBookUseCase.execute(const NewBook(url: '836945f1-1d12-419c-a736-69db139a6e62'))).called(1),
+    verify: (_) => verify(
+      () =>
+          storeNewBookUseCase.execute(const NewBook(title: 'vf6gU65bGf', url: '836945f1-1d12-419c-a736-69db139a6e62')),
+    ).called(1),
   );
 }
 
@@ -85,5 +88,3 @@ class _MockDownloadEpubBookUrl extends Mock implements DownloadEpubBookByUrl {}
 class _MockNewBook extends Mock implements NewBook {}
 
 class _MockBookDownloader extends Mock implements BookDownloader {}
-
-class _MockEpubBook extends Mock implements EpubBook {}

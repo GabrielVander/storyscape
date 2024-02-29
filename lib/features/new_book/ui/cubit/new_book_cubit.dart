@@ -1,10 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rust_core/result.dart';
+import 'package:rust_core/typedefs.dart';
 import 'package:storyscape/core/logging/storyscape_logger.dart';
 import 'package:storyscape/core/logging/storyscape_logger_factory.dart';
 import 'package:storyscape/features/new_book/domain/entities/book_downloader.dart';
-import 'package:storyscape/features/new_book/domain/entities/existing_book.dart';
 import 'package:storyscape/features/new_book/domain/entities/new_book.dart';
 import 'package:storyscape/features/new_book/domain/usecases/download_epub_book_by_url.dart';
 import 'package:storyscape/features/new_book/domain/usecases/store_new_book.dart';
@@ -31,10 +31,12 @@ class NewBookCubit extends Cubit<NewBookState> {
         .inspectErr((_) => emit(NewBookError()));
   }
 
-  Future<Result<ExistingBook, String>> _storeBook(NewBook book) => _storeNewBook.execute(book);
+  Future<Result<Unit, String>> _storeBook(NewBook book) => _storeNewBook.execute(book);
 
   FutureResult<NewBook, String> _dowloadBook(String url, BookDownloader downloader) =>
-      _downloadEpubBookByUrl(url, downloader).inspectErr(_logger.warn).map((_) => NewBook(url: url));
+      _downloadEpubBookByUrl(url, downloader)
+          .inspectErr(_logger.warn)
+          .map((book) => NewBook(title: book.Title, url: url));
 
   void _onDownloadProgressUpdate(double percentage) {
     final RegExp leadingZerosRegex = RegExp(r'\.?0*$');

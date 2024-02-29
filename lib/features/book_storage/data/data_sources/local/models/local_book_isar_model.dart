@@ -7,10 +7,11 @@ part 'local_book_isar_model.g.dart';
 
 @collection
 class LocalBookIsarModel {
-  const LocalBookIsarModel({required this.id, required this.url});
+  const LocalBookIsarModel({required this.id, required this.title, required this.url});
 
   final Id? id;
-  final String url;
+  final String? title;
+  final String? url;
 }
 
 abstract interface class LocalBookIsarModelMapper {
@@ -22,7 +23,7 @@ abstract interface class LocalBookIsarModelMapper {
 class LocalBookIsarModelMapperImpl implements LocalBookIsarModelMapper {
   @override
   Result<LocalBookIsarModel, String> fromNewBook(NewBook book) =>
-      Ok<NewBook, String>(book).map((b) => LocalBookIsarModel(id: null, url: b.url));
+      Ok<NewBook, String>(book).map((b) => LocalBookIsarModel(id: null, title: b.title, url: b.url));
 
   @override
   Result<ExistingBook, String> toExistingBook(LocalBookIsarModel model) {
