@@ -7,9 +7,9 @@ name: Flutter Analysis/Test
 
 on:
   pull_request:
-    branches: [ "develop", "master" ]
+    branches: [ "master" ]
   push:
-    branches: [ "develop", "master" ]
+    branches: [ "develop" ]
 
 jobs:
   build:
