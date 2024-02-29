@@ -8,6 +8,8 @@ name: Flutter Analysis/Test
 on:
   pull_request:
     branches: [ "develop", "master" ]
+  push:
+    branches: [ "develop", "master" ]
 
 jobs:
   build:
@@ -16,10 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Note: This workflow uses the latest stable version of the Dart SDK.
+      # Note: This workflow uses the latest bea version of the Flutter SDK.
       # You can specify other versions if desired, see documentation here:
       # https://github.com/dart-lang/setup-dart/blob/main/README.md
-      # - uses: dart-lang/setup-dart@9a04e6d73cca37bd455e0608d7e5092f881fd603
       - uses: subosito/flutter-action@v2
         with:
           channel: 'beta'
