@@ -7,7 +7,7 @@ class Storyscape extends StatelessWidget {
   Storyscape({super.key});
 
   final GoRouter _router = GoRouter(
-    initialLocation: const BookSelectionRoute().location,
+    initialLocation: BookSelectionRoute().location,
     debugLogDiagnostics: true,
     routes: $appRoutes,
   );

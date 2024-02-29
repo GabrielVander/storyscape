@@ -9,6 +9,16 @@
   },
   "bookSelection": {
     "pageTitle": "Open book",
-    "urlFieldLabel": "Book URL"
+    "error": {
+      "genericErrorMessage": "Something went wrong",
+      "unableToUpdateBooks": "Unable to update books",
+      "unexpectedState": "Unexpected UI state",
+      "noDisplayName": "<Unknown>"
+    }
+  },
+  "newBook": {
+    "urlBookFailure": "Unable to load book by URL",
+    "urlFieldLabel": "Book URL",
+    "bookSavedSuccessfully": "Book saved successfully"
   }
 }

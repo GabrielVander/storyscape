@@ -12,7 +12,7 @@ devices, allowing them to easily access and keep track of their reading progress
 anywhere. By leveraging the power of open source technology, we aim to build a community-driven
 platform that is both user-friendly and customizable for readers worldwide.
 
-Features (that we aspire to achieve):
+## Desired features
 
 1. Easy Book Downloads: Users will be able to download ePub books directly onto their devices
    through Storyscape's intuitive interface.
@@ -32,9 +32,9 @@ Features (that we aspire to achieve):
    transparency and accountability in the development process, as well as collaboration with the
    broader tech community to identify and address any issues or bugs that may arise.
 
-Current Features:
+## Current features
 
-At present, Storyscape offers the ability to display an ePub book downloaded through a user-provided
+- At present, Storyscape offers the ability to display an ePub book downloaded through a user-provided
 URL. This allows users to easily access their favorite books on any device with an internet
 connection.
 
