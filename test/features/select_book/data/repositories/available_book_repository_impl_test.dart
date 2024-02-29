@@ -53,9 +53,9 @@ void main() {
     expect(
       result,
       isA<Ok<List<AvailableBook>, String>>().having((r) => r.ok, 'ok', <AvailableBook>[
-        AvailableBook(url: 'f71fcfe7-a09f-4775-9efb-d62a00b7323d'),
-        AvailableBook(url: '98d04a24-5672-4eaa-89a9-5850d1a8370e'),
-        AvailableBook(url: 'bae3a379-cf80-41d7-b4ad-b892acf00a1b'),
+        AvailableBook(id: 238, url: 'f71fcfe7-a09f-4775-9efb-d62a00b7323d'),
+        AvailableBook(id: 8, url: '98d04a24-5672-4eaa-89a9-5850d1a8370e'),
+        AvailableBook(id: 224, url: 'bae3a379-cf80-41d7-b4ad-b892acf00a1b'),
       ]),
     );
   });

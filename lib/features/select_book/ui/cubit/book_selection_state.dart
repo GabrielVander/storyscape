@@ -50,16 +50,23 @@ class BookSelectionBooksLoaded extends BookSelectionState {
 }
 
 class BookSelectionViewModel with EquatableMixin {
-  BookSelectionViewModel({required this.displayName});
+  BookSelectionViewModel({required this.id, required this.displayName});
 
+  final int id;
   final String displayName;
 
-  BookSelectionViewModel copyWith({String? displayName}) =>
-      BookSelectionViewModel(displayName: displayName ?? this.displayName);
+  @override
+  List<Object> get props => [id, displayName];
 
   @override
-  List<Object> get props => [displayName];
+  String toString() => 'BookSelectionViewModel{id: $id, displayName: $displayName}';
 
-  @override
-  String toString() => 'BookSelectionViewModel{displayName: $displayName}';
+  BookSelectionViewModel copyWith({
+    int? id,
+    String? displayName,
+  }) =>
+      BookSelectionViewModel(
+        id: id ?? this.id,
+        displayName: displayName ?? this.displayName,
+      );
 }

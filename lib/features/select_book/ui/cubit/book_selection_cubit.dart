@@ -21,42 +21,68 @@ class BookSelectionCubit extends Cubit<BookSelectionState> {
   final StoryscapeLogger _logger = StoryscapeLoggerFactory.generic();
   final RetrieveStoredBooks _retrieveStoredBooksUseCase;
   final CheckAvailableBooksChange _checkAvailableBooksChangeUseCase;
+  late List<AvailableBook> _books;
 
   Future<void> loadStoredBooks() async => Future.value(const Ok(()))
       .inspect((_) => emit(BookSelectionLoading()))
-      .andThen((_) => _retrieveStoredBooks())
-      .andThen((_) => _listenToUpdates(_updateStoredBooks));
+      .andThen((_) => _loadBooks())
+      .andThen((_) => _listenToUpdates(_updateBooks));
+
+  FutureResult<Unit, String> _loadBooks() => Future.value(const Ok<Unit, String>(()))
+      .andThen((_) => _displayBooks())
+      .inspectErr(_emitLoadingError)
+      .inspectErr(_logger.warn);
+
+  void _emitLoadingError(String error) {
+    return emit(
+      BookSelectionLoadingError(
+        errorCode: BookSelectionErrorCode.unableToLoadStoredBooks.name,
+        errorContext: error,
+      ),
+    );
+  }
 
   Result<Stream<Unit>, String> _listenToUpdates(void Function() onUpdate) => const Ok<Unit, String>(())
       .andThen((_) => _checkAvailableBooksChangeUseCase())
       .inspect((stream) => stream.listen((_) => onUpdate()))
       .inspectErr(_logger.warn);
 
-  FutureResult<Unit, String> _retrieveStoredBooks() async => Future.value(const Ok<Unit, String>(()))
-      .andThen((_) => _retrieveStoredBooksUseCase())
-      .inspect(_emitStoredBooksLoaded)
-      .map((_) => ())
-      .inspectErr(_logger.warn)
-      .inspectErr(_emitStoredBooksLoadingError);
+  FutureResult<Unit, String> _updateBooks() =>
+      _displayBooks().inspectErr((_) => emit(const BookSelectionUpdateError()));
 
-  FutureResult<Unit, String> _updateStoredBooks() async => Future.value(const Ok<Unit, String>(()))
-      .andThen((_) => _retrieveStoredBooksUseCase())
-      .inspect(_emitStoredBooksLoaded)
-      .map((_) => ())
-      .inspectErr(_logger.warn)
-      .inspectErr((_) => emit(const BookSelectionUpdateError()));
+  FutureResult<Unit, String> _displayBooks() async => Future.value(const Ok<Unit, String>(()))
+      .andThen((_) => _retrieveAvailableBooks())
+      .inspect((books) => emit(BookSelectionBooksLoaded(books: books)))
+      .map((_) => ());
 
-  void _emitStoredBooksLoaded(List<AvailableBook> books) {
-    final List<BookSelectionViewModel> viewModels =
-        books.map((e) => BookSelectionViewModel(displayName: e.url)).toList();
+  FutureResult<List<BookSelectionViewModel>, String> _retrieveAvailableBooks() => _retrieveStoredBooksUseCase()
+      .inspect((books) => _books = books)
+      .map((books) => books.map(_parseBook).toList())
+      .inspectErr(_logger.warn);
 
-    return emit(BookSelectionBooksLoaded(books: viewModels));
+  BookSelectionViewModel _parseBook(AvailableBook e) => BookSelectionViewModel(
+        id: e.id,
+        displayName: e.url,
+      );
+
+  Future<void> open(BookSelectionViewModel book) async {
+    emit(BookSelectionLoading());
+
+    _retrieveSelectedBook(book)
+        .inspect((ok) => emit(BookSelectionSelected(url: ok.url)))
+        .inspectErr(
+          (_) => emit(
+            BookSelectionLoadingError(
+              errorCode: BookSelectionErrorCode.unableToSelectBookByUrl.name,
+              errorContext: null,
+            ),
+          ),
+        )
+        .inspect((_) => emit(BookSelectionInitial()));
   }
 
-  void _emitStoredBooksLoadingError(String error) {
-    final String errorCode = BookSelectionErrorCode.unableToLoadStoredBooks.name;
-
-    return emit(BookSelectionLoadingError(errorCode: errorCode, errorContext: error));
+  Ok<AvailableBook, Object> _retrieveSelectedBook(BookSelectionViewModel book) {
+    return _books.firstWhere((e) => e.id == book.id).toOk();
   }
 }
 

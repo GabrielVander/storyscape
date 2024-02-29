@@ -25,7 +25,7 @@ class AvailableBookRepositoryImpl implements AvailableBookRepository {
   Iterable<AvailableBook> _mapLocalIsarBookModelsToStoredBooks(List<LocalBookIsarModel> models) =>
       models.map(_mapSingleLocalIsarBookToStoredBook);
 
-  AvailableBook _mapSingleLocalIsarBookToStoredBook(LocalBookIsarModel m) => AvailableBook(url: m.url);
+  AvailableBook _mapSingleLocalIsarBookToStoredBook(LocalBookIsarModel m) => AvailableBook(id: m.id!, url: m.url);
 
   FutureResult<List<LocalBookIsarModel>, String> _fetchAllBooksFromIsar() =>
       _isarDataSource.getAllBooks().inspectErr(_logger.warn);

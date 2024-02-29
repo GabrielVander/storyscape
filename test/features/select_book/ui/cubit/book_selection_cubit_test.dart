@@ -60,8 +60,8 @@ void main() {
     setUp: () {
       when(() => retrieveStoredBooks.call()).thenAnswer(
         (_) async => Ok([
-          AvailableBook(url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          AvailableBook(url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          AvailableBook(id: 962, url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+          AvailableBook(id: 753, url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
         ]),
       );
       when(() => checkAvailableBooksChange.call()).thenReturn(const Err('T1KwTc6'));
@@ -71,8 +71,8 @@ void main() {
     expect: () => [
       BookSelectionBooksLoaded(
         books: [
-          BookSelectionViewModel(displayName: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          BookSelectionViewModel(displayName: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          BookSelectionViewModel(id: 962, displayName: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+          BookSelectionViewModel(id: 753, displayName: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
         ],
       ),
     ],
@@ -85,8 +85,8 @@ void main() {
     setUp: () {
       when(() => retrieveStoredBooks.call()).thenAnswer(
         (_) async => Ok([
-          AvailableBook(url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          AvailableBook(url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          AvailableBook(id: 4, url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+          AvailableBook(id: 531, url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
         ]),
       );
 
@@ -97,8 +97,8 @@ void main() {
     expect: () => [
       BookSelectionBooksLoaded(
         books: [
-          BookSelectionViewModel(displayName: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          BookSelectionViewModel(displayName: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          BookSelectionViewModel(id: 4, displayName: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+          BookSelectionViewModel(id: 531, displayName: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
         ],
       ),
     ],
@@ -106,6 +106,49 @@ void main() {
       verify(() => retrieveStoredBooks()).called(3);
       verify(() => checkAvailableBooksChange()).called(1);
     },
+  );
+
+  blocTest<BookSelectionCubit, BookSelectionState>(
+    'should emit loading state when opening book',
+    build: () => cubit,
+    setUp: () {
+      when(() => retrieveStoredBooks.call()).thenAnswer(
+        (_) async => Ok([
+          AvailableBook(id: 97, url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+          AvailableBook(id: 497, url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+        ]),
+      );
+
+      when(() => checkAvailableBooksChange.call()).thenReturn(Ok(Stream<Unit>.fromIterable([(), ()])));
+    },
+    act: (cubit) async {
+      await cubit.loadStoredBooks();
+      await cubit.open(BookSelectionViewModel(id: 97, displayName: '0598b842-3781-4daa-8a4a-c9001f219ada'));
+    },
+    skip: 2,
+    expect: () => [BookSelectionLoading(), anything, anything, anything],
+  );
+
+  blocTest<BookSelectionCubit, BookSelectionState>(
+    'should emit selected state when opening book',
+    build: () => cubit,
+    setUp: () {
+      when(() => retrieveStoredBooks.call()).thenAnswer(
+        (_) async => Ok([
+          AvailableBook(id: 447, url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
+          AvailableBook(id: 234, url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+        ]),
+      );
+
+      when(() => checkAvailableBooksChange.call()).thenReturn(Ok(Stream<Unit>.fromIterable([(), ()])));
+    },
+    act: (cubit) async {
+      await cubit.loadStoredBooks();
+      await cubit.open(BookSelectionViewModel(id: 234, displayName: 'ef0ba65d-f281-4b5e-a7cf-164171627918'));
+    },
+    skip: 3,
+    expect: () =>
+        [const BookSelectionSelected(url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'), BookSelectionInitial(), anything],
   );
 }
 

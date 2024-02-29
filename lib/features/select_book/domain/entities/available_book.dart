@@ -1,10 +1,11 @@
 import 'package:equatable/equatable.dart';
 
 class AvailableBook with EquatableMixin {
-  AvailableBook({required this.url});
+  AvailableBook({required this.id, required this.url});
 
+  final int id;
   final String url;
 
   @override
-  List<Object?> get props => [url];
+  List<Object?> get props => [id, url];
 }

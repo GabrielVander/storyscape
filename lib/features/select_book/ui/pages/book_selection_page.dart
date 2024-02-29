@@ -45,19 +45,21 @@ class BookSelection extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    useEffect(
-      () {
-        _bookSelectionCubit.loadStoredBooks();
-
-        return null;
-      },
-      [],
-    );
     useBlocListener(
       _bookSelectionCubit,
-      (bloc, current, context) => ScaffoldMessenger.of(context)
+      (_, __, context) => ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('bookSelection.error.unableToUpdateBooks'.tr()))),
-      listenWhen: (s) => [BookSelectionUpdateError].contains(s.runtimeType),
+      listenWhen: (s) => s is BookSelectionUpdateError,
+    );
+
+    useBlocListener(
+      _bookSelectionCubit,
+      (_, current, context) {
+        if (current case BookSelectionSelected(:final url)) {
+          WidgetsBinding.instance.addPostFrameCallback((_) => BookReadingRoute(url: url).push<void>(context));
+        }
+      },
+      listenWhen: (s) => s is BookSelectionSelected,
     );
 
     final BookSelectionState state = useBlocBuilder(
@@ -67,16 +69,24 @@ class BookSelection extends HookWidget {
         BookSelectionLoading,
         BookSelectionLoadingError,
         BookSelectionBooksLoaded,
-        BookSelectionSelected,
       ].contains(s.runtimeType),
+    );
+    final bool shouldUpdate = state is BookSelectionInitial;
+
+    useEffect(
+      () {
+        _bookSelectionCubit.loadStoredBooks();
+
+        return null;
+      },
+      [shouldUpdate],
     );
 
     switch (state) {
-      case BookSelectionSelected(:final url):
-        BookReadingRoute(url: url).push<void>(context);
-        return const Center(child: CircularProgressIndicator());
-
       case BookSelectionInitial() || BookSelectionLoading():
+        if (state is BookSelectionInitial) {
+          WidgetsBinding.instance.addPostFrameCallback((_) => _bookSelectionCubit.loadStoredBooks());
+        }
         return const Center(child: CircularProgressIndicator());
 
       case BookSelectionLoadingError(:final errorCode, :final errorContext):
@@ -94,13 +104,16 @@ class BookSelection extends HookWidget {
           crossAxisCount: 2,
           children: books
               .map(
-                (book) => Card.outlined(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const FlutterLogo(size: 72),
-                      Text(book.displayName),
-                    ],
+                (book) => GestureDetector(
+                  onTap: () => _bookSelectionCubit.open(book),
+                  child: Card.outlined(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const FlutterLogo(size: 72),
+                        Text(book.displayName),
+                      ],
+                    ),
                   ),
                 ),
               )
