@@ -245,10 +245,10 @@ packages:
     dependency: "direct main"
     description:
       name: easy_localization
-      sha256: "9c86754b22aaa3e74e471635b25b33729f958dd6fb83df0ad6612948a7b231af"
+      sha256: c145aeb6584aedc7c862ab8c737c3277788f47488bfdf9bae0fe112bd0a4789c
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.4"
+    version: "3.0.5"
   easy_logger:
     dependency: transitive
     description:
@@ -553,10 +553,10 @@ packages:
     dependency: "direct main"
     description:
       name: logger
-      sha256: "6bbb9d6f7056729537a4309bda2e74e18e5d9f14302489cc1e93f33b3fe32cac"
+      sha256: b3ff55aeb08d9d8901b767650285872cb1bb8f508373b3e348d60268b0c7f770
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2+1"
+    version: "2.1.0"
   logging:
     dependency: transitive
     description:
@@ -761,10 +761,10 @@ packages:
     dependency: "direct main"
     description:
       name: rust_core
-      sha256: d72e43fd8e095e95c7de98efc367bc617285f2e95cf1038e9b6aa773b68fef70
+      sha256: "624e0eeeeb930f8d04b64bafc68064d3745ec6cb9149a36cbf89e1b7540305d0"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.6"
+    version: "0.4.0"
   scrollable_positioned_list:
     dependency: transitive
     description:
@@ -938,14 +938,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
-  tapper:
-    dependency: "direct main"
-    description:
-      name: tapper
-      sha256: "238c3379f006a0d391b0173f713be76921971484ab4aeafd7d56aac32f7d0215"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.7"
   term_glyph:
     dependency: transitive
     description:
