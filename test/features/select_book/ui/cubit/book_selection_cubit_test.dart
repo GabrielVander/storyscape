@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -60,8 +62,16 @@ void main() {
     setUp: () {
       when(() => retrieveStoredBooks.call()).thenAnswer(
         (_) async => Ok([
-          AvailableBook(id: 962, title: 'NI1UI3tvG', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          AvailableBook(id: 753, title: 'Bj0UXzh', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          AvailableBook(
+            id: 962,
+            content: Uint8List.fromList(List.empty()),
+            url: '0598b842-3781-4daa-8a4a-c9001f219ada',
+          ),
+          AvailableBook(
+            id: 753,
+            content: Uint8List.fromList(List.of([1, 1, 1, 0, 1, 0])),
+            url: 'ef0ba65d-f281-4b5e-a7cf-164171627918',
+          ),
         ]),
       );
       when(() => checkAvailableBooksChange.call()).thenReturn(const Err('T1KwTc6'));
@@ -71,8 +81,8 @@ void main() {
     expect: () => [
       BookSelectionBooksLoaded(
         books: [
-          BookSelectionViewModel(id: 962, displayName: 'NI1UI3tvG'),
-          BookSelectionViewModel(id: 753, displayName: 'Bj0UXzh'),
+          BookSelectionItemViewModel(id: 962, rawData: Uint8List.fromList(List.empty())),
+          BookSelectionItemViewModel(id: 753, rawData: Uint8List.fromList(List.of([1, 1, 1, 0, 1, 0]))),
         ],
       ),
     ],
@@ -85,8 +95,16 @@ void main() {
     setUp: () {
       when(() => retrieveStoredBooks.call()).thenAnswer(
         (_) async => Ok([
-          AvailableBook(id: 4, title: '3TeFsLuUlMp', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          AvailableBook(id: 531, title: '3S3tJMiY2MV', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          AvailableBook(
+            id: 4,
+            content: Uint8List.fromList(List.empty()),
+            url: '0598b842-3781-4daa-8a4a-c9001f219ada',
+          ),
+          AvailableBook(
+            id: 531,
+            content: Uint8List.fromList(List.of([1, 1, 1, 0, 1, 0])),
+            url: 'ef0ba65d-f281-4b5e-a7cf-164171627918',
+          ),
         ]),
       );
 
@@ -97,8 +115,8 @@ void main() {
     expect: () => [
       BookSelectionBooksLoaded(
         books: [
-          BookSelectionViewModel(id: 4, displayName: '3TeFsLuUlMp'),
-          BookSelectionViewModel(id: 531, displayName: '3S3tJMiY2MV'),
+          BookSelectionItemViewModel(id: 4, rawData: Uint8List.fromList(List.empty())),
+          BookSelectionItemViewModel(id: 531, rawData: Uint8List.fromList(List.of([1, 1, 1, 0, 1, 0]))),
         ],
       ),
     ],
@@ -114,8 +132,16 @@ void main() {
     setUp: () {
       when(() => retrieveStoredBooks.call()).thenAnswer(
         (_) async => Ok([
-          AvailableBook(id: 97, title: 'bYpSoUDCEF', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          AvailableBook(id: 497, title: 'r0acGty', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          AvailableBook(
+            id: 97,
+            content: Uint8List.fromList(List.empty()),
+            url: '0598b842-3781-4daa-8a4a-c9001f219ada',
+          ),
+          AvailableBook(
+            id: 497,
+            content: Uint8List.fromList(List.of([1, 1, 1, 0, 1, 0])),
+            url: 'ef0ba65d-f281-4b5e-a7cf-164171627918',
+          ),
         ]),
       );
 
@@ -123,7 +149,7 @@ void main() {
     },
     act: (cubit) async {
       await cubit.loadStoredBooks();
-      await cubit.open(BookSelectionViewModel(id: 97, displayName: '0598b842-3781-4daa-8a4a-c9001f219ada'));
+      await cubit.open(BookSelectionItemViewModel(id: 97, rawData: Uint8List.fromList(List.empty())));
     },
     skip: 2,
     expect: () => [BookSelectionLoading(), anything, anything, anything],
@@ -135,8 +161,16 @@ void main() {
     setUp: () {
       when(() => retrieveStoredBooks.call()).thenAnswer(
         (_) async => Ok([
-          AvailableBook(id: 447, title: 'cKjPqCd1hDA', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          AvailableBook(id: 234, title: 'CG5wyq72q0', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          AvailableBook(
+            id: 447,
+            content: Uint8List.fromList(List.empty()),
+            url: '0598b842-3781-4daa-8a4a-c9001f219ada',
+          ),
+          AvailableBook(
+            id: 234,
+            content: Uint8List.fromList(List.of([1, 1, 1, 0, 1, 0])),
+            url: 'ef0ba65d-f281-4b5e-a7cf-164171627918',
+          ),
         ]),
       );
 
@@ -144,7 +178,7 @@ void main() {
     },
     act: (cubit) async {
       await cubit.loadStoredBooks();
-      await cubit.open(BookSelectionViewModel(id: 234, displayName: 'ef0ba65d-f281-4b5e-a7cf-164171627918'));
+      await cubit.open(BookSelectionItemViewModel(id: 234, rawData: Uint8List.fromList(List.of([1, 1, 1, 0, 1, 0]))));
     },
     skip: 3,
     expect: () =>

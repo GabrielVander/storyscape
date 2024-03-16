@@ -13,7 +13,8 @@
       "genericErrorMessage": "Something went wrong",
       "unableToUpdateBooks": "Unable to update books",
       "unexpectedState": "Unexpected UI state",
-      "noDisplayName": "<Unknown>"
+      "noDisplayName": "<Unknown>",
+      "noData": "No data"
     }
   },
   "newBook": {

@@ -55,21 +55,21 @@ class BookSelectionCubit extends Cubit<BookSelectionState> {
       .inspect((books) => emit(BookSelectionBooksLoaded(books: books)))
       .map((_) => ());
 
-  FutureResult<List<BookSelectionViewModel>, String> _retrieveAvailableBooks() => _retrieveStoredBooksUseCase()
+  FutureResult<List<BookSelectionItemViewModel>, String> _retrieveAvailableBooks() => _retrieveStoredBooksUseCase()
       .inspect((books) => _books = books)
-      .map((books) => books.map(_parseBook).toList())
+      .map((books) => books.map(_toItemVIewModel).toList())
       .inspectErr(_logger.warn);
 
-  BookSelectionViewModel _parseBook(AvailableBook e) => BookSelectionViewModel(
-        id: e.id,
-        displayName: e.title,
+  BookSelectionItemViewModel _toItemVIewModel(AvailableBook book) => BookSelectionItemViewModel(
+        id: book.id,
+        title: book.title,
       );
 
-  Future<void> open(BookSelectionViewModel book) async {
+  Future<void> open(BookSelectionItemViewModel book) async {
     emit(BookSelectionLoading());
 
     _retrieveSelectedBook(book)
-        .inspect((ok) => emit(BookSelectionSelected(url: ok.url!)))
+        .inspect((_) => emit(BookSelectionSelected(url: _.title!)))
         .inspectErr(
           (_) => emit(
             BookSelectionLoadingError(
@@ -81,7 +81,7 @@ class BookSelectionCubit extends Cubit<BookSelectionState> {
         .inspect((_) => emit(BookSelectionInitial()));
   }
 
-  Ok<AvailableBook, Object> _retrieveSelectedBook(BookSelectionViewModel book) {
+  Ok<AvailableBook, Object> _retrieveSelectedBook(BookSelectionItemViewModel book) {
     return _books.firstWhere((e) => e.id == book.id).toOk();
   }
 }

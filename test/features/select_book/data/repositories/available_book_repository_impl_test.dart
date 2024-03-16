@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -41,10 +42,18 @@ void main() {
 
   test('should return Ok with expected books when fetching all books', () async {
     when(() => isarDataSource.getAllBooks()).thenAnswer(
-      (_) async => const Ok([
-        LocalBookIsarModel(id: 238, title: 'bglvbFX', url: 'f71fcfe7-a09f-4775-9efb-d62a00b7323d'),
-        LocalBookIsarModel(id: 8, title: 'cRA7xtr', url: '98d04a24-5672-4eaa-89a9-5850d1a8370e'),
-        LocalBookIsarModel(id: 224, title: 'Uuk2T7vOYF', url: 'bae3a379-cf80-41d7-b4ad-b892acf00a1b'),
+      (_) async => Ok([
+        LocalBookIsarModel(
+          id: 238,
+          data: List.of([1, 1, 1, 0, 1, 1]),
+          url: 'f71fcfe7-a09f-4775-9efb-d62a00b7323d',
+        ),
+        LocalBookIsarModel(id: 8, data: Uint8List.fromList(List.empty()), url: '98d04a24-5672-4eaa-89a9-5850d1a8370e'),
+        LocalBookIsarModel(
+          id: 224,
+          data: List.of([1, 0, 0, 0, 1, 0]),
+          url: 'bae3a379-cf80-41d7-b4ad-b892acf00a1b',
+        ),
       ]),
     );
 
@@ -53,9 +62,17 @@ void main() {
     expect(
       result,
       isA<Ok<List<AvailableBook>, String>>().having((r) => r.ok, 'ok', <AvailableBook>[
-        AvailableBook(id: 238, title: 'bglvbFX', url: 'f71fcfe7-a09f-4775-9efb-d62a00b7323d'),
-        AvailableBook(id: 8, title: 'cRA7xtr', url: '98d04a24-5672-4eaa-89a9-5850d1a8370e'),
-        AvailableBook(id: 224, title: 'Uuk2T7vOYF', url: 'bae3a379-cf80-41d7-b4ad-b892acf00a1b'),
+        AvailableBook(
+          id: 238,
+          content: Uint8List.fromList(List.of([1, 1, 1, 0, 1, 1])),
+          url: 'f71fcfe7-a09f-4775-9efb-d62a00b7323d',
+        ),
+        AvailableBook(id: 8, content: Uint8List.fromList(List.empty()), url: '98d04a24-5672-4eaa-89a9-5850d1a8370e'),
+        AvailableBook(
+          id: 224,
+          content: Uint8List.fromList(List.of([1, 0, 0, 0, 1, 0])),
+          url: 'bae3a379-cf80-41d7-b4ad-b892acf00a1b',
+        ),
       ]),
     );
   });
