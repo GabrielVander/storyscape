@@ -17,6 +17,7 @@ import 'package:storyscape/features/book_storage/domain/repositories/existing_bo
 import 'package:storyscape/features/book_storage/domain/usecases/save_book_by_url.dart';
 import 'package:storyscape/features/new_book/ui/cubit/new_book_cubit.dart';
 import 'package:storyscape/features/new_book/ui/widgets/new_book_modal.dart';
+import 'package:storyscape/features/read_book/domain/usecases/retrieve_book_file_by_id.dart';
 import 'package:storyscape/features/read_book/ui/cubit/book_reader_cubit.dart';
 import 'package:storyscape/features/select_book/data/repositories/available_book_repository_impl.dart';
 import 'package:storyscape/features/select_book/domain/repositories/available_book_repository.dart';
@@ -69,20 +70,21 @@ Future<void> _setUpAppDirectory(GetIt locator) async {
 }
 
 void _setUpReadBookInjections(GetIt locator) {
-  locator.registerSingleton<BookReaderCubit>(
-    BookReaderCubit(
-      networkFileRetriever: (String url, void Function(double) progressUpdater) async => InternetFile.get(
-        url,
-        progress: (receivedLength, contentLength) => progressUpdater(receivedLength / contentLength * 100),
+  locator
+    ..registerLazySingleton<RetrieveBookFileById>(
+      () => RetrieveBookFileById(existingBookRepository: locator.get<ExistingBookRepository>()),
+    )
+    ..registerLazySingleton<BookReaderCubit>(
+      () => BookReaderCubit(
+        retrieveBookFileByIdUseCase: locator.get<RetrieveBookFileById>(),
       ),
-    ),
-  );
+    );
 }
 
 void _setUpBookStorageInjections(GetIt locator) {
   locator
     ..registerSingleton<BookIsarDataSource>(
-      BookIsarDataSourceImpl(
+      BookIsarDataSource(
         isar: locator.get<Isar>(),
       ),
     )

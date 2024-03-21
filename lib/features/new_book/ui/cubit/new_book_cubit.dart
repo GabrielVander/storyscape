@@ -19,20 +19,15 @@ class NewBookCubit extends Cubit<NewBookState> {
   final SaveBookByUrl _saveBookByUrlUseCase;
 
   Future<void> addNewBookByUrl(String url) async {
-    _logger.info('Adding new book by url');
-
     emit(NewBookLoading());
 
     _listenToDownloadProgress();
 
-    await _saveBookByUrl(url);
+    await _saveBookByUrl(url).inspect((_) => emit(NewBookSaved())).inspectErr((_) => emit(NewBookError()));
   }
 
-  FutureResult<ExistingBook, String> _saveBookByUrl(String url) async => _saveBookByUrlUseCase
-      .call(url)
-      .inspect((_) => emit(NewBookSaved()))
-      .inspectErr(_logger.warn)
-      .inspectErr((_) => emit(NewBookError()));
+  FutureResult<ExistingBook, String> _saveBookByUrl(String url) async =>
+      _saveBookByUrlUseCase.call(url).inspectErr(_logger.warn);
 
   StreamSubscription<double> _listenToDownloadProgress() =>
       _saveBookByUrlUseCase.downloadPercentage().listen(_onDownloadProgressUpdate);

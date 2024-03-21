@@ -32,12 +32,12 @@ class BookSelectionUpdateError extends BookSelectionState {
 }
 
 class BookSelectionSelected extends BookSelectionState {
-  const BookSelectionSelected({required this.url});
+  const BookSelectionSelected({required this.id});
 
-  final String url;
+  final int id;
 
   @override
-  List<Object?> get props => [url];
+  List<Object?> get props => [id];
 }
 
 class BookSelectionBooksLoaded extends BookSelectionState {

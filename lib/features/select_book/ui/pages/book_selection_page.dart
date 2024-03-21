@@ -55,8 +55,8 @@ class BookSelection extends HookWidget {
     useBlocListener(
       _bookSelectionCubit,
       (_, current, context) {
-        if (current case BookSelectionSelected(:final url)) {
-          WidgetsBinding.instance.addPostFrameCallback((_) => BookReadingRoute(url: url).push<void>(context));
+        if (current case BookSelectionSelected(id: final url)) {
+          WidgetsBinding.instance.addPostFrameCallback((_) => BookReadingRoute(id: url).push<void>(context));
         }
       },
       listenWhen: (s) => s is BookSelectionSelected,

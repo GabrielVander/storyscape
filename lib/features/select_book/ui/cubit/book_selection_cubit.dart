@@ -69,21 +69,26 @@ class BookSelectionCubit extends Cubit<BookSelectionState> {
     emit(BookSelectionLoading());
 
     _retrieveSelectedBook(book)
-        .inspect((_) => emit(BookSelectionSelected(url: _.title!)))
+        .inspect((_) => emit(BookSelectionSelected(id: _.id)))
         .inspectErr(
           (_) => emit(
-            BookSelectionLoadingError(
-              errorCode: BookSelectionErrorCode.unableToSelectBookByUrl.name,
-              errorContext: null,
-            ),
+            BookSelectionLoadingError(errorCode: BookSelectionErrorCode.unableToSelectBook.name, errorContext: null),
           ),
         )
         .inspect((_) => emit(BookSelectionInitial()));
   }
 
-  Ok<AvailableBook, Object> _retrieveSelectedBook(BookSelectionItemViewModel book) {
-    return _books.firstWhere((e) => e.id == book.id).toOk();
+  Result<AvailableBook, String> _retrieveSelectedBook(BookSelectionItemViewModel book) =>
+      _findBookById(book).inspectErr(_logger.error);
+
+  Result<AvailableBook, String> _findBookById(BookSelectionItemViewModel viewModel) {
+    final AvailableBook defaultBook = AvailableBook(id: -1, title: null, author: null);
+    final AvailableBook book = _books.firstWhere((e) => e.id == viewModel.id, orElse: () => defaultBook);
+
+    if (book == defaultBook) return const Err('Unable to find book');
+
+    return Ok(book);
   }
 }
 
-enum BookSelectionErrorCode { unableToSelectBookByUrl, unableToLoadStoredBooks }
+enum BookSelectionErrorCode { unableToSelectBook, unableToLoadStoredBooks }

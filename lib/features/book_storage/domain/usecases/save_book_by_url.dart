@@ -27,9 +27,8 @@ class SaveBookByUrl {
       .inspect((_) => _logger.info('Book saved successfully'))
       .mapErr((_) => 'Unable to save book by url');
 
-  FutureResult<ExistingBook, String> _storeDownloadedBook(ParsedBook book) => Future.value(Ok<ParsedBook, String>(book))
-      .andThen(_existingBookRepository.storeDownloadedBook)
-      .inspectErr(_logger.warn);
+  FutureResult<ExistingBook, String> _storeDownloadedBook(ParsedBook book) =>
+      Future.value(Ok<ParsedBook, String>(book)).andThen(_existingBookRepository.storeBook).inspectErr(_logger.warn);
 
   FutureResult<ParsedBook, String> _downloadBookByUrl(String url) => Future.value(Ok<String, String>(url))
       .andThen((_) => _downloadedBookRepository.downloadAndParseBookByUrl(_, _updateDownloadPercentage))
@@ -37,7 +36,7 @@ class SaveBookByUrl {
       .inspectErr(_logger.warn);
 
   void _updateDownloadPercentage(int receivedLength, int contentLength) =>
-      _streamController.add((receivedLength / contentLength).floorToDouble());
+      _streamController.add(((receivedLength / contentLength) * 100).floorToDouble());
 
   Stream<double> downloadPercentage() => _streamController.stream;
 }

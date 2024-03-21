@@ -1,57 +1,34 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rust_core/result.dart';
 import 'package:storyscape/core/logging/storyscape_logger.dart';
 import 'package:storyscape/core/logging/storyscape_logger_factory.dart';
+import 'package:storyscape/features/read_book/domain/entities/book_file.dart';
+import 'package:storyscape/features/read_book/domain/usecases/retrieve_book_file_by_id.dart';
 
 part 'book_reader_state.dart';
 
 class BookReaderCubit extends Cubit<BookReaderState> {
-  BookReaderCubit({required NetworkFileRetriever networkFileRetriever})
-      : _networkFileRetriever = networkFileRetriever,
+  BookReaderCubit({required RetrieveBookFileById retrieveBookFileByIdUseCase})
+      : _retrieveBookFileByIdUseCase = retrieveBookFileByIdUseCase,
         super(BookReaderInitial());
 
   final StoryscapeLogger _logger = StoryscapeLoggerFactory.generic();
-  final NetworkFileRetriever _networkFileRetriever;
+  final RetrieveBookFileById _retrieveBookFileByIdUseCase;
 
-  Future<void> download(String link) async {
-    _logger.info('Downloading book from $link...');
+  Future<void> open(int id) async {
     emit(BookReaderLoading());
 
-    (await performDownloadOperation(link))
-        .inspect((content) => emit(BookReaderFinished(content: content)))
-        .mapErr((e) => e.toString())
-        .inspectErr((error) => emit(BookReaderError(errorCode: BookReaderErrorCodes.generic.value, context: error)));
+    (await retrieveBookFileById(id))
+        .inspect((_) => emit(BookReaderFinished(file: _.value)))
+        .inspectErr((_) => emit(BookReaderError(errorCode: BookReaderErrorCodes.generic.value, context: _)));
   }
 
-  Future<Result<Uint8List, Exception>> performDownloadOperation(String link) async {
-    try {
-      return Ok(await downloadFileUsingNetworkRetriever(link));
-    } on Exception catch (e, stacktrace) {
-      _logger.error(e.toString(), error: e, stackTrace: stacktrace);
-
-      return Err(e);
-    }
-  }
-
-  Future<Uint8List> downloadFileUsingNetworkRetriever(String link) async {
-    _logger.debug('Downloading book from network file retriever...');
-
-    return _networkFileRetriever(link, updateDownloadPercentage);
-  }
-
-  void updateDownloadPercentage(double percentage) {
-    final leadingZerosRegex = RegExp(r'\.?0*$');
-    final String prettyPercentage = percentage.toStringAsFixed(2).replaceFirst(leadingZerosRegex, '');
-
-    emit(
-      BookReaderDownloading(
-        percentageDisplay: '$prettyPercentage%',
-        percentageValue: percentage / 100,
-      ),
-    );
-  }
+  FutureResult<BookFile, String> retrieveBookFileById(int id) async =>
+      _retrieveBookFileByIdUseCase.call(id).inspectErr(_logger.warn);
 }
 
 enum BookReaderErrorCodes {

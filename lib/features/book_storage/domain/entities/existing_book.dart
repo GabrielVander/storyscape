@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 
-class ExistingBook extends Equatable {
+class ExistingBook with EquatableMixin {
   const ExistingBook({required this.id, required this.file});
 
   final int id;

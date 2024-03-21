@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:rust_core/result.dart';
 import 'package:storyscape/core/logging/storyscape_logger.dart';
 import 'package:storyscape/core/logging/storyscape_logger_factory.dart';
@@ -16,7 +18,7 @@ class ExistingBookRepositoryImpl implements ExistingBookRepository {
   final BookIsarDataSource _isarDataSource;
 
   @override
-  FutureResult<ExistingBook, String> storeDownloadedBook(ParsedBook book) => Future.value(Ok<ParsedBook, String>(book))
+  FutureResult<ExistingBook, String> storeBook(ParsedBook book) => Future.value(Ok<ParsedBook, String>(book))
       .inspect((_) => _logger.debug('Storing downloaded book...'))
       .andThen(_storeBookLocally)
       .inspect((_) => _logger.debug('Book stored successfully'))
@@ -34,4 +36,25 @@ class ExistingBookRepositoryImpl implements ExistingBookRepository {
 
   LocalBookIsarModel _toIsarModel(ParsedBook book) =>
       LocalBookIsarModel(id: null, path: book.file.path, url: book.url, title: book.title, author: book.author);
+
+  @override
+  FutureResult<ExistingBook, String> retrieveBookById(int id) => _getBookById(id).andThen(_parseBookInfo);
+
+  Result<ExistingBook, String> _parseBookInfo(LocalBookIsarModel? model) =>
+      _parseModel(model).inspectErr(_logger.error).mapErr((_) => 'Unable to parse retrieved book info');
+
+  FutureResult<LocalBookIsarModel?, String> _getBookById(int id) {
+    return _isarDataSource
+        .getBookById(id)
+        .inspectErr(_logger.warn)
+        .mapErr((error) => 'Unable to retrieve book by id: $id');
+  }
+
+  Result<ExistingBook, String> _parseModel(LocalBookIsarModel? model) {
+    if (model == null) return const Err('Book not found');
+    if (model.id == null) return const Err('Received no id information');
+    if (model.path == null) return const Err('Received no file path information');
+
+    return Ok(ExistingBook(id: model.id!, file: File(model.path!)));
+  }
 }

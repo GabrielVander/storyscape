@@ -1,9 +1,10 @@
+import 'package:equatable/equatable.dart';
 import 'package:isar/isar.dart';
 
 part 'local_book_isar_model.g.dart';
 
-@collection
-class LocalBookIsarModel {
+@Collection(inheritance: false)
+class LocalBookIsarModel with EquatableMixin {
   LocalBookIsarModel({
     required this.id,
     required this.url,
@@ -17,4 +18,8 @@ class LocalBookIsarModel {
   final String? path;
   final String? title;
   final String? author;
+
+  @override
+  @ignore
+  List<Object?> get props => [id, url, path, title, author];
 }

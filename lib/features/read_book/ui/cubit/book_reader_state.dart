@@ -35,10 +35,10 @@ class BookReaderError extends BookReaderState {
 }
 
 class BookReaderFinished extends BookReaderState {
-  const BookReaderFinished({required this.content});
+  const BookReaderFinished({required this.file});
 
-  final Uint8List content;
+  final File file;
 
   @override
-  List<Object> get props => [content];
+  List<Object> get props => [file];
 }

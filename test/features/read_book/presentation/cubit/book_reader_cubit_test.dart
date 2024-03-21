@@ -1,99 +1,62 @@
+import 'dart:io';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:rust_core/result.dart';
+import 'package:storyscape/features/read_book/domain/entities/book_file.dart';
+import 'package:storyscape/features/read_book/domain/usecases/retrieve_book_file_by_id.dart';
 import 'package:storyscape/features/read_book/ui/cubit/book_reader_cubit.dart';
 
 Future<Uint8List> dummyNetworkFileRetriever(String link, void Function(double) p) async =>
     Uint8List.fromList(List.empty());
 
 void main() {
+  late RetrieveBookFileById retrieveBookFileById;
+  late File dummyFile;
+  late BookReaderCubit cubit;
+
+  setUp(() {
+    retrieveBookFileById = _MockRetrieveBookFileById();
+    dummyFile = _FakeFile();
+
+    cubit = BookReaderCubit(retrieveBookFileByIdUseCase: retrieveBookFileById);
+  });
+
   test('emits [BookReaderInitial] as initial state', () {
-    expect(BookReaderCubit(networkFileRetriever: dummyNetworkFileRetriever).state, BookReaderInitial());
+    expect(cubit.state, BookReaderInitial());
   });
 
   blocTest<BookReaderCubit, BookReaderState>(
-    'emits [BookReaderLoading] when starting book download',
-    build: () => BookReaderCubit(networkFileRetriever: dummyNetworkFileRetriever),
-    act: (BookReaderCubit cubit) => cubit.download('8kWs26km7n'),
-    expect: () => [BookReaderLoading(), BookReaderFinished(content: Uint8List.fromList(List.empty()))],
-  );
-
-  for (final bundle in [
-    (
-      [
-        isA<BookReaderDownloading>()
-            .having((s) => s.percentageDisplay, 'percentageDisplay', '0%')
-            .having((s) => s.percentageValue, 'percentageValue', closeTo(0, 0.001)),
-        isA<BookReaderFinished>().having((s) => s.content, 'content', Uint8List.fromList(List.empty())),
-      ],
-      [0.0]
-    ),
-    (
-      [
-        isA<BookReaderDownloading>()
-            .having((s) => s.percentageDisplay, 'percentageDisplay', '4.51%')
-            .having((s) => s.percentageValue, 'percentageValue', closeTo(0.0451, 0.001)),
-        isA<BookReaderDownloading>()
-            .having((s) => s.percentageDisplay, 'percentageDisplay', '5%')
-            .having((s) => s.percentageValue, 'percentageValue', closeTo(0.05, 0.001)),
-        isA<BookReaderDownloading>()
-            .having((s) => s.percentageDisplay, 'percentageDisplay', '9.86%')
-            .having((s) => s.percentageValue, 'percentageValue', closeTo(0.0986, 0.001)),
-        isA<BookReaderDownloading>()
-            .having((s) => s.percentageDisplay, 'percentageDisplay', '90.3%')
-            .having((s) => s.percentageValue, 'percentageValue', closeTo(0.903, 0.001)),
-        isA<BookReaderDownloading>()
-            .having((s) => s.percentageDisplay, 'percentageDisplay', '99.14%')
-            .having((s) => s.percentageValue, 'percentageValue', closeTo(0.9914, 0.001)),
-        isA<BookReaderFinished>().having((s) => s.content, 'content', Uint8List.fromList(List.empty())),
-      ],
-      [4.51, 5.00002, 9.86, 90.3, 99.14442]
-    ),
-  ]) {
-    final List<Matcher> expectedStates = bundle.$1;
-    final List<double> progressUpdates = bundle.$2;
-
-    blocTest<BookReaderCubit, BookReaderState>(
-      'emits $expectedStates when starting book download with given progress updates: $progressUpdates',
-      build: () => BookReaderCubit(
-        networkFileRetriever: (l, p) async {
-          progressUpdates.forEach(p);
-
-          return Uint8List.fromList(List.empty());
-        },
-      ),
-      act: (BookReaderCubit cubit) => cubit.download('L749Z5lJ4K'),
-      skip: 1,
-      expect: () => expectedStates,
-    );
-  }
-
-  blocTest<BookReaderCubit, BookReaderState>(
-    'emits [BookReaderError] when book download fails',
-    build: () => BookReaderCubit(networkFileRetriever: (_, __) => throw Exception('AWS5hgz')),
-    act: (BookReaderCubit cubit) => cubit.download('RCjoC9H'),
-    skip: 1,
-    expect: () => [BookReaderError(errorCode: BookReaderErrorCodes.generic.value, context: 'Exception: AWS5hgz')],
+    'emits [BookReaderLoading] when starting book retrieval',
+    build: () => cubit,
+    setUp: () => when(() => retrieveBookFileById.call(any())).thenAnswer((_) async => const Err('pXBEuQFKP')),
+    act: (cubit) => cubit.open(241),
+    expect: () => [BookReaderLoading(), isA<BookReaderError>()],
   );
 
   blocTest<BookReaderCubit, BookReaderState>(
-    'emits [BookReaderFinished] when book download succeeds returning no bytes',
-    build: () => BookReaderCubit(networkFileRetriever: (_, __) async => Uint8List.fromList(List.empty())),
-    act: (BookReaderCubit cubit) => cubit.download('JeW5kkqtYnk'),
+    'emits [BookReaderError] when unable to retrieve book',
+    setUp: () =>
+        when(() => retrieveBookFileById.call(146)).thenAnswer((_) async => const Err<BookFile, String>('zKnP43VaI4')),
+    build: () => cubit,
+    act: (BookReaderCubit cubit) => cubit.open(146),
     skip: 1,
-    expect: () => [BookReaderFinished(content: Uint8List.fromList(List.empty()))],
+    expect: () => [BookReaderError(errorCode: BookReaderErrorCodes.generic.value, context: 'zKnP43VaI4')],
   );
 
-  for (final content in [
-    Uint8List.fromList([875]),
-    Uint8List.fromList([631, 339, 824, 249]),
-  ]) {
-    blocTest<BookReaderCubit, BookReaderState>(
-      'emits [BookReaderFinished] when book download succeeds returning $content as content',
-      build: () => BookReaderCubit(networkFileRetriever: (_, __) async => content),
-      act: (BookReaderCubit cubit) => cubit.download('os8wHuV'),
-      skip: 1,
-      expect: () => [BookReaderFinished(content: content)],
-    );
-  }
+  blocTest<BookReaderCubit, BookReaderState>(
+    'emits [BookReaderFinished] when book retrieved successfully',
+    setUp: () => when(() => retrieveBookFileById.call(191))
+        .thenAnswer((invocation) async => Ok(BookFile(id: 191, value: dummyFile))),
+    build: () => cubit,
+    act: (BookReaderCubit cubit) => cubit.open(191),
+    skip: 1,
+    expect: () => [BookReaderFinished(file: dummyFile)],
+  );
 }
+
+class _MockRetrieveBookFileById extends Mock implements RetrieveBookFileById {}
+
+class _FakeFile extends Fake implements File {}

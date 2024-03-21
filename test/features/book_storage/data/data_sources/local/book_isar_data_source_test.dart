@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:isar/isar.dart';
 import 'package:mocktail/mocktail.dart';
@@ -14,7 +12,7 @@ import 'package:storyscape/features/book_storage/data/data_sources/local/models/
 void main() {
   const String isarDbDirectoryPath = 'test/features/new_book/data/data_sources/local/isar_db';
   late Isar isar;
-  late BookIsarDataSourceImpl dataSource;
+  late BookIsarDataSource dataSource;
 
   setUpAll(() async {
     final Directory isarDbDirectory = await Directory(isarDbDirectoryPath).create(recursive: true);
@@ -37,7 +35,7 @@ void main() {
   });
 
   setUp(() {
-    dataSource = BookIsarDataSourceImpl(isar: isar);
+    dataSource = BookIsarDataSource(isar: isar);
   });
 
   tearDown(() async {
@@ -49,8 +47,9 @@ void main() {
   });
 
   test('should return Ok if operation succeeds when upserting a book', () async {
-    final Result<int, String> result = await dataSource
-        .upsertBook(LocalBookIsarModel(id: null, data: Uint8List.fromList(List.of([336, 167])), url: 'xdtzk7YW'));
+    final Result<int, String> result = await dataSource.upsertBook(
+      LocalBookIsarModel(id: null, path: 'bRQWjCWzrRT', author: 'UVENh9EvC4', title: 'OCXxyvEX', url: 'xdtzk7YW'),
+    );
 
     expect(result, const Ok(1));
   });
@@ -58,78 +57,100 @@ void main() {
   test('should return Ok with empty list if there are no books when getting all books', () async {
     final Result<List<LocalBookIsarModel>, String> result = await dataSource.getAllBooks();
 
-    expect(
-      result,
-      isA<Ok<List<LocalBookIsarModel>, String>>().having((ok) => ok.ok, 'ok', <LocalBookIsarModel>[]),
-    );
+    expect(result.isOk(), true, reason: result.toString());
+    expect(result.unwrap(), <LocalBookIsarModel>[]);
   });
 
   test('should return Ok with expected books when getting all books', () async {
-    await dataSource.upsertBook(
-      LocalBookIsarModel(
-        id: null,
-        data: Uint8List.fromList(List.of([1, 0, 1, 0, 0, 1])),
-        url: 'eefd65d5-ff77-4aa0-8ab6-24fa5a4b17a6',
-      ),
+    final LocalBookIsarModel model1 = LocalBookIsarModel(
+      id: null,
+      path: '8Qe35H3K',
+      url: 'eefd65d5-ff77-4aa0-8ab6-24fa5a4b17a6',
+      title: 'a0z4pSSbY1J',
+      author: 'GcYmg4ft',
     );
-    await dataSource.upsertBook(
-      LocalBookIsarModel(
-        id: null,
-        data: Uint8List.fromList(List.of([1, 1, 1, 0, 1, 0])),
-        url: '4df9abd6-47d8-45fe-b38b-5308c9b74ac0',
-      ),
+    final LocalBookIsarModel model2 = LocalBookIsarModel(
+      id: null,
+      path: null,
+      url: null,
+      title: null,
+      author: null,
     );
-    await dataSource.upsertBook(
-      LocalBookIsarModel(
-        id: null,
-        data: Uint8List.fromList(List.of([1, 1, 1, 1, 1, 1])),
-        url: 'e47d18a0-c4e0-4647-b423-edfc4738c5db',
-      ),
+    final LocalBookIsarModel model3 = LocalBookIsarModel(
+      id: null,
+      url: 'e47d18a0-c4e0-4647-b423-edfc4738c5db',
+      path: '1GXSrZaf9X',
+      title: 'Nisllobortis',
+      author: null,
     );
+    final List<LocalBookIsarModel> expected = [
+      LocalBookIsarModel(
+        id: 1,
+        path: model1.path,
+        url: model1.url,
+        title: model1.title,
+        author: model1.author,
+      ),
+      LocalBookIsarModel(
+        id: 2,
+        path: model2.path,
+        url: model2.url,
+        title: model2.title,
+        author: model2.author,
+      ),
+      LocalBookIsarModel(
+        id: 3,
+        path: model3.path,
+        url: model3.url,
+        title: model3.title,
+        author: model3.author,
+      ),
+    ];
+
+    await dataSource.upsertBook(model1);
+    await dataSource.upsertBook(model2);
+    await dataSource.upsertBook(model3);
 
     final Result<List<LocalBookIsarModel>, String> result = await dataSource.getAllBooks();
 
-    expect(
-      result,
-      isA<Ok<List<LocalBookIsarModel>, String>>().having((ok) => ok.ok, 'ok', [
-        isA<LocalBookIsarModel>()
-            .having((m) => m.id, 'id', isA<int>())
-            .having((m) => m.data, 'data', Uint8List.fromList(List.of([1, 0, 1, 0, 0, 1])))
-            .having((m) => m.url, 'url', 'eefd65d5-ff77-4aa0-8ab6-24fa5a4b17a6'),
-        isA<LocalBookIsarModel>()
-            .having((m) => m.id, 'id', isA<int>())
-            .having((m) => m.data, 'data', Uint8List.fromList(List.of([1, 1, 1, 0, 1, 0])))
-            .having((m) => m.url, 'url', '4df9abd6-47d8-45fe-b38b-5308c9b74ac0'),
-        isA<LocalBookIsarModel>()
-            .having((m) => m.id, 'id', isA<int>())
-            .having((m) => m.data, 'data', Uint8List.fromList(List.of([1, 1, 1, 1, 1, 1])))
-            .having((m) => m.url, 'url', 'e47d18a0-c4e0-4647-b423-edfc4738c5db'),
-      ]),
-    );
+    expect(result.isOk(), true, reason: result.toString());
+    expect(result.unwrap(), expected);
   });
 
   test('should return Ok with expected books when watching all books', () async {
-    await dataSource.upsertBook(
-      LocalBookIsarModel(
-        id: null,
-        data: Uint8List.fromList(List.of([1, 0, 0, 1, 1, 1])),
-        url: 'eefd65d5-ff77-4aa0-8ab6-24fa5a4b17a6',
-      ),
+    final LocalBookIsarModel model1 = LocalBookIsarModel(
+      id: null,
+      path: '8Qe35H3K',
+      url: 'eefd65d5-ff77-4aa0-8ab6-24fa5a4b17a6',
+      title: 'a0z4pSSbY1J',
+      author: 'GcYmg4ft',
     );
-    await dataSource.upsertBook(
-      LocalBookIsarModel(
-        id: null,
-        data: Uint8List.fromList(List.of([0, 0, 0, 1, 0, 1])),
-        url: '4df9abd6-47d8-45fe-b38b-5308c9b74ac0',
-      ),
+    final LocalBookIsarModel model2 = LocalBookIsarModel(
+      id: null,
+      path: null,
+      url: null,
+      title: null,
+      author: null,
     );
-    await dataSource.upsertBook(
-      LocalBookIsarModel(
-        id: null,
-        data: Uint8List.fromList(List.of([0, 0, 1, 0, 1, 0])),
-        url: 'e47d18a0-c4e0-4647-b423-edfc4738c5db',
-      ),
+    final LocalBookIsarModel model3 = LocalBookIsarModel(
+      id: null,
+      url: 'e47d18a0-c4e0-4647-b423-edfc4738c5db',
+      path: '1GXSrZaf9X',
+      title: 'Nisllobortis',
+      author: null,
     );
+
+    final LocalBookIsarModel model4 = LocalBookIsarModel(
+      id: null,
+      url: '0zyhi8vmS',
+      path: 'PRsqJciAdu',
+      title: null,
+      author: null,
+    );
+
+    await dataSource.upsertBook(model1);
+    await dataSource.upsertBook(model2);
+    await dataSource.upsertBook(model3);
 
     final Result<Stream<Unit>, String> result = dataSource.watchLazyAllBooks();
 
@@ -137,26 +158,81 @@ void main() {
 
     unawaited(expectLater(result.unwrap(), emitsInOrder([(), (), ()])));
 
-    await dataSource.upsertBook(
+    await dataSource.upsertBook(model4);
+    await dataSource.upsertBook(model4);
+    await dataSource.upsertBook(model4);
+  });
+
+  test('should return Ok with expected book when fetching book by id', () async {
+    final LocalBookIsarModel model1 = LocalBookIsarModel(
+      id: null,
+      path: '8Qe35H3K',
+      url: 'eefd65d5-ff77-4aa0-8ab6-24fa5a4b17a6',
+      title: 'a0z4pSSbY1J',
+      author: 'GcYmg4ft',
+    );
+    final LocalBookIsarModel model2 = LocalBookIsarModel(
+      id: null,
+      path: null,
+      url: null,
+      title: null,
+      author: null,
+    );
+
+    await dataSource.upsertBook(model1);
+    await dataSource.upsertBook(model2);
+
+    final Result<LocalBookIsarModel?, String> result1 = await dataSource.getBookById(1);
+
+    expect(result1.isOk(), true, reason: result1.unwrap().toString());
+    expect(
+      result1.unwrap(),
       LocalBookIsarModel(
-        id: null,
-        data: Uint8List.fromList(List.of([1, 1, 0, 1, 1])),
-        url: 'eefd65d5-ff77-4aa0-8ab6-24fa5a4b17a6',
+        id: 1,
+        path: model1.path,
+        url: model1.url,
+        title: model1.title,
+        author: model1.author,
       ),
     );
-    await dataSource.upsertBook(
+
+    final Result<LocalBookIsarModel?, String> result2 = await dataSource.getBookById(2);
+
+    expect(result2.isOk(), true, reason: result1.unwrap().toString());
+    expect(
+      result2.unwrap(),
       LocalBookIsarModel(
-        id: null,
-        data: Uint8List.fromList(List.of([0, 0, 0, 0, 0, 1])),
-        url: '4df9abd6-47d8-45fe-b38b-5308c9b74ac0',
+        id: 2,
+        path: model2.path,
+        url: model2.url,
+        title: model2.title,
+        author: model2.author,
       ),
     );
-    await dataSource.upsertBook(
-      LocalBookIsarModel(
-        id: null,
-        data: Uint8List.fromList(List.of([1, 1, 0, 1, 0, 0])),
-        url: 'e47d18a0-c4e0-4647-b423-edfc4738c5db',
-      ),
+  });
+
+  test('should return null when fetching unknown book by id', () async {
+    final LocalBookIsarModel model1 = LocalBookIsarModel(
+      id: null,
+      path: '8Qe35H3K',
+      url: 'eefd65d5-ff77-4aa0-8ab6-24fa5a4b17a6',
+      title: 'a0z4pSSbY1J',
+      author: 'GcYmg4ft',
     );
+    final LocalBookIsarModel model2 = LocalBookIsarModel(
+      id: null,
+      path: null,
+      url: null,
+      title: null,
+      author: null,
+    );
+
+    await dataSource.upsertBook(model1);
+    await dataSource.upsertBook(model2);
+
+    final Result<LocalBookIsarModel?, String> result = await dataSource.getBookById(3);
+
+    expect(result.isOk(), true, reason: result.unwrap().toString());
+    expect(result.unwrap(), null);
   });
 }

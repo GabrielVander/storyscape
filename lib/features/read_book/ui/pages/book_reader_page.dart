@@ -8,16 +8,16 @@ import 'package:hooked_bloc/hooked_bloc.dart';
 import 'package:storyscape/features/read_book/ui/cubit/book_reader_cubit.dart';
 
 class BookReaderPage extends HookWidget {
-  const BookReaderPage({required this.url, required this.bookReaderCubit, super.key});
+  const BookReaderPage({required this.id, required this.bookReaderCubit, super.key});
 
-  final String url;
+  final int id;
   final BookReaderCubit bookReaderCubit;
 
   @override
   Widget build(BuildContext context) {
     useEffect(
       () {
-        bookReaderCubit.download(url);
+        bookReaderCubit.open(id);
 
         return null;
       },
@@ -74,7 +74,7 @@ class BookReaderPage extends HookWidget {
 
     if (bookReaderState is BookReaderFinished) {
       final EpubController epubController = EpubController(
-        document: EpubDocument.openData(bookReaderState.content),
+        document: EpubDocument.openFile(bookReaderState.file),
       );
 
       return Scaffold(
