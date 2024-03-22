@@ -55,8 +55,8 @@ class BookSelection extends HookWidget {
     useBlocListener(
       _bookSelectionCubit,
       (_, current, context) {
-        if (current case BookSelectionSelected(:final url)) {
-          WidgetsBinding.instance.addPostFrameCallback((_) => BookReadingRoute(url: url).push<void>(context));
+        if (current case BookSelectionSelected(id: final url)) {
+          WidgetsBinding.instance.addPostFrameCallback((_) => BookReadingRoute(id: url).push<void>(context));
         }
       },
       listenWhen: (s) => s is BookSelectionSelected,
@@ -106,29 +106,7 @@ class BookSelection extends HookWidget {
               .map(
                 (book) => GestureDetector(
                   onTap: () => _bookSelectionCubit.open(book),
-                  child: Card.outlined(
-                    key: ValueKey<int>(book.id),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const FlutterLogo(size: 72),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                book.displayName ?? 'bookSelection.error.noDisplayName'.tr(),
-                                softWrap: true,
-                                maxLines: 3,
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+                  child: SelectionItem(itemViewModel: book),
                 ),
               )
               .toList(),
@@ -136,5 +114,62 @@ class BookSelection extends HookWidget {
       case _:
         return Center(child: Text('bookSelection.error.unexpectedState'.tr()));
     }
+  }
+}
+
+class SelectionItem extends StatelessWidget {
+  const SelectionItem({
+    required this.itemViewModel,
+    super.key,
+  });
+
+  final BookSelectionItemViewModel itemViewModel;
+
+  @override
+  Widget build(BuildContext context) {
+    if (itemViewModel.id == null) {
+      return _ErrorMessage(text: 'bookSelection.error.noData'.tr());
+    }
+    return Card.outlined(
+      key: ValueKey<int>(itemViewModel.id!),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const FlutterLogo(size: 72),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Text(
+                  itemViewModel.title ?? 'bookSelection.error.noDisplayName'.tr(),
+                  softWrap: true,
+                  maxLines: 3,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ErrorMessage extends StatelessWidget {
+  const _ErrorMessage({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card.outlined(
+      child: Center(
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.red),
+        ),
+      ),
+    );
   }
 }

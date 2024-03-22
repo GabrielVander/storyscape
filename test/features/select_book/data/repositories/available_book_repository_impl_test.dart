@@ -40,23 +40,36 @@ void main() {
   });
 
   test('should return Ok with expected books when fetching all books', () async {
-    when(() => isarDataSource.getAllBooks()).thenAnswer(
-      (_) async => const Ok([
-        LocalBookIsarModel(id: 238, title: 'bglvbFX', url: 'f71fcfe7-a09f-4775-9efb-d62a00b7323d'),
-        LocalBookIsarModel(id: 8, title: 'cRA7xtr', url: '98d04a24-5672-4eaa-89a9-5850d1a8370e'),
-        LocalBookIsarModel(id: 224, title: 'Uuk2T7vOYF', url: 'bae3a379-cf80-41d7-b4ad-b892acf00a1b'),
-      ]),
-    );
+    final List<LocalBookIsarModel> models = [
+      LocalBookIsarModel(id: 238, url: 'f71fcfe7-a09f-4775-9efb-d62a00b7323d', path: null, author: null, title: null),
+      LocalBookIsarModel(
+        id: 8,
+        author: 've8Ps1mm6',
+        title: null,
+        path: '35paZAmq',
+        url: '98d04a24-5672-4eaa-89a9-5850d1a8370e',
+      ),
+      LocalBookIsarModel(
+        id: 224,
+        url: 'bae3a379-cf80-41d7-b4ad-b892acf00a1b',
+        path: 'y2fz2TmEW',
+        title: 'bEWVEEcl',
+        author: 'MhLk6Itu7',
+      ),
+    ];
+    final List<AvailableBook> expected = <AvailableBook>[
+      AvailableBook(id: 238, title: null, author: null),
+      AvailableBook(id: 8, title: null, author: 've8Ps1mm6'),
+      AvailableBook(id: 224, title: 'bEWVEEcl', author: 'MhLk6Itu7'),
+    ];
+
+    when(() => isarDataSource.getAllBooks()).thenAnswer((_) async => Ok(models));
 
     final Result<List<AvailableBook>, String> result = await repository.fetchAllAvailableBooks();
 
     expect(
       result,
-      isA<Ok<List<AvailableBook>, String>>().having((r) => r.ok, 'ok', <AvailableBook>[
-        AvailableBook(id: 238, title: 'bglvbFX', url: 'f71fcfe7-a09f-4775-9efb-d62a00b7323d'),
-        AvailableBook(id: 8, title: 'cRA7xtr', url: '98d04a24-5672-4eaa-89a9-5850d1a8370e'),
-        AvailableBook(id: 224, title: 'Uuk2T7vOYF', url: 'bae3a379-cf80-41d7-b4ad-b892acf00a1b'),
-      ]),
+      isA<Ok<List<AvailableBook>, String>>().having((r) => r.ok, 'ok', expected),
     );
   });
 

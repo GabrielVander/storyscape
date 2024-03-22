@@ -761,10 +761,10 @@ packages:
     dependency: "direct main"
     description:
       name: rust_core
-      sha256: "624e0eeeeb930f8d04b64bafc68064d3745ec6cb9149a36cbf89e1b7540305d0"
+      sha256: "3b61f6e32dc8af47dc8fa27b662c5ace9db713fd4dd5e9fd77400e6577d51fb8"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.0"
+    version: "0.5.3"
   scrollable_positioned_list:
     dependency: transitive
     description:

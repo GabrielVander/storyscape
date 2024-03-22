@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rust_core/result.dart';
 import 'package:rust_core/typedefs.dart';
-import 'package:storyscape/features/new_book/domain/entities/new_book.dart';
 import 'package:storyscape/features/select_book/domain/entities/available_book.dart';
 import 'package:storyscape/features/select_book/domain/usecases/check_available_books_change.dart';
 import 'package:storyscape/features/select_book/domain/usecases/retrieve_available_books.dart';
@@ -23,8 +22,6 @@ void main() {
       retrieveStoredBooksUseCase: retrieveStoredBooks,
       checkAvailableBooksChangeUseCase: checkAvailableBooksChange,
     );
-
-    registerFallbackValue(_MockNewBook());
   });
 
   tearDown(resetMocktailState);
@@ -60,8 +57,8 @@ void main() {
     setUp: () {
       when(() => retrieveStoredBooks.call()).thenAnswer(
         (_) async => Ok([
-          AvailableBook(id: 962, title: 'NI1UI3tvG', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          AvailableBook(id: 753, title: 'Bj0UXzh', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          AvailableBook(id: 962, author: null, title: null),
+          AvailableBook(id: 753, title: 'xrd9WEwNkfk', author: 'iPDRhA4'),
         ]),
       );
       when(() => checkAvailableBooksChange.call()).thenReturn(const Err('T1KwTc6'));
@@ -71,8 +68,8 @@ void main() {
     expect: () => [
       BookSelectionBooksLoaded(
         books: [
-          BookSelectionViewModel(id: 962, displayName: 'NI1UI3tvG'),
-          BookSelectionViewModel(id: 753, displayName: 'Bj0UXzh'),
+          BookSelectionItemViewModel(id: 962, title: null),
+          BookSelectionItemViewModel(id: 753, title: 'xrd9WEwNkfk'),
         ],
       ),
     ],
@@ -85,8 +82,8 @@ void main() {
     setUp: () {
       when(() => retrieveStoredBooks.call()).thenAnswer(
         (_) async => Ok([
-          AvailableBook(id: 4, title: '3TeFsLuUlMp', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          AvailableBook(id: 531, title: '3S3tJMiY2MV', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          AvailableBook(id: 962, author: null, title: null),
+          AvailableBook(id: 753, title: 'xrd9WEwNkfk', author: 'iPDRhA4'),
         ]),
       );
 
@@ -97,8 +94,8 @@ void main() {
     expect: () => [
       BookSelectionBooksLoaded(
         books: [
-          BookSelectionViewModel(id: 4, displayName: '3TeFsLuUlMp'),
-          BookSelectionViewModel(id: 531, displayName: '3S3tJMiY2MV'),
+          BookSelectionItemViewModel(id: 962, title: null),
+          BookSelectionItemViewModel(id: 753, title: 'xrd9WEwNkfk'),
         ],
       ),
     ],
@@ -114,8 +111,8 @@ void main() {
     setUp: () {
       when(() => retrieveStoredBooks.call()).thenAnswer(
         (_) async => Ok([
-          AvailableBook(id: 97, title: 'bYpSoUDCEF', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          AvailableBook(id: 497, title: 'r0acGty', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          AvailableBook(id: 962, author: null, title: null),
+          AvailableBook(id: 753, title: 'xrd9WEwNkfk', author: 'iPDRhA4'),
         ]),
       );
 
@@ -123,10 +120,34 @@ void main() {
     },
     act: (cubit) async {
       await cubit.loadStoredBooks();
-      await cubit.open(BookSelectionViewModel(id: 97, displayName: '0598b842-3781-4daa-8a4a-c9001f219ada'));
+      await cubit.open(BookSelectionItemViewModel(id: 753, title: 'xrd9WEwNkfk'));
     },
     skip: 2,
     expect: () => [BookSelectionLoading(), anything, anything, anything],
+  );
+
+  blocTest<BookSelectionCubit, BookSelectionState>(
+    'should emit error state when opening book',
+    build: () => cubit,
+    setUp: () {
+      when(() => retrieveStoredBooks.call()).thenAnswer(
+        (_) async => Ok([
+          AvailableBook(id: 962, author: null, title: null),
+          AvailableBook(id: 753, title: 'xrd9WEwNkfk', author: 'iPDRhA4'),
+        ]),
+      );
+
+      when(() => checkAvailableBooksChange.call()).thenReturn(Ok(Stream<Unit>.fromIterable([(), ()])));
+    },
+    act: (cubit) async {
+      await cubit.loadStoredBooks();
+      await cubit.open(BookSelectionItemViewModel(id: 444, title: 'qiqycg665s'));
+    },
+    skip: 3,
+    expect: () => [
+      BookSelectionLoadingError(errorCode: BookSelectionErrorCode.unableToSelectBook.name, errorContext: null),
+      anything,
+    ],
   );
 
   blocTest<BookSelectionCubit, BookSelectionState>(
@@ -135,8 +156,8 @@ void main() {
     setUp: () {
       when(() => retrieveStoredBooks.call()).thenAnswer(
         (_) async => Ok([
-          AvailableBook(id: 447, title: 'cKjPqCd1hDA', url: '0598b842-3781-4daa-8a4a-c9001f219ada'),
-          AvailableBook(id: 234, title: 'CG5wyq72q0', url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'),
+          AvailableBook(id: 962, author: null, title: null),
+          AvailableBook(id: 753, title: 'xrd9WEwNkfk', author: 'iPDRhA4'),
         ]),
       );
 
@@ -144,16 +165,13 @@ void main() {
     },
     act: (cubit) async {
       await cubit.loadStoredBooks();
-      await cubit.open(BookSelectionViewModel(id: 234, displayName: 'ef0ba65d-f281-4b5e-a7cf-164171627918'));
+      await cubit.open(BookSelectionItemViewModel(id: 962, title: null));
     },
     skip: 3,
-    expect: () =>
-        [const BookSelectionSelected(url: 'ef0ba65d-f281-4b5e-a7cf-164171627918'), BookSelectionInitial(), anything],
+    expect: () => [const BookSelectionSelected(id: 962), BookSelectionInitial(), anything],
   );
 }
 
 class _MockRetrieveStoredBooks extends Mock implements RetrieveStoredBooks {}
 
 class _MockCheckAvailableBooksChange extends Mock implements CheckAvailableBooksChange {}
-
-class _MockNewBook extends Mock implements NewBook {}

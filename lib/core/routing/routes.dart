@@ -11,14 +11,14 @@ part 'routes.g.dart';
 @TypedGoRoute<BookReadingRoute>(path: '/book/read')
 @immutable
 class BookReadingRoute extends GoRouteData {
-  BookReadingRoute({required this.url});
+  BookReadingRoute({required this.id});
 
   final GetIt _locator = GetIt.instance;
-  final String url;
+  final int id;
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return BookReaderPage(url: url, bookReaderCubit: _locator.get<BookReaderCubit>());
+    return BookReaderPage(id: id, bookReaderCubit: _locator.get<BookReaderCubit>());
   }
 }
 

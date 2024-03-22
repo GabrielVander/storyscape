@@ -1,42 +1,36 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rust_core/result.dart';
-import 'package:rust_core/typedefs.dart';
 import 'package:storyscape/core/logging/storyscape_logger.dart';
 import 'package:storyscape/core/logging/storyscape_logger_factory.dart';
-import 'package:storyscape/features/new_book/domain/entities/book_downloader.dart';
-import 'package:storyscape/features/new_book/domain/entities/new_book.dart';
-import 'package:storyscape/features/new_book/domain/usecases/download_epub_book_by_url.dart';
-import 'package:storyscape/features/new_book/domain/usecases/store_new_book.dart';
+import 'package:storyscape/features/book_storage/domain/entities/existing_book.dart';
+import 'package:storyscape/features/book_storage/domain/usecases/save_book_by_url.dart';
 
 part 'new_book_state.dart';
 
 class NewBookCubit extends Cubit<NewBookState> {
-  NewBookCubit({required DownloadEpubBookByUrl downloadEpubBookByUrl, required StoreNewBook storeNewBook})
-      : _downloadEpubBookByUrl = downloadEpubBookByUrl,
-        _storeNewBook = storeNewBook,
+  NewBookCubit({required SaveBookByUrl saveBookByUrlUseCase})
+      : _saveBookByUrlUseCase = saveBookByUrlUseCase,
         super(NewBookInitial());
 
   final StoryscapeLogger _logger = StoryscapeLoggerFactory.generic();
-  final DownloadEpubBookByUrl _downloadEpubBookByUrl;
-  final StoreNewBook _storeNewBook;
+  final SaveBookByUrl _saveBookByUrlUseCase;
 
   Future<void> addNewBookByUrl(String url) async {
     emit(NewBookLoading());
-    final BookDownloader downloader = InternetFileBookDownloader()..progress().listen(_onDownloadProgressUpdate);
 
-    await _dowloadBook(url, downloader)
-        .andThen(_storeBook)
-        .inspect((_) => emit(NewBookSaved()))
-        .inspectErr((_) => emit(NewBookError()));
+    _listenToDownloadProgress();
+
+    await _saveBookByUrl(url).inspect((_) => emit(NewBookSaved())).inspectErr((_) => emit(NewBookError()));
   }
 
-  Future<Result<Unit, String>> _storeBook(NewBook book) => _storeNewBook.execute(book);
+  FutureResult<ExistingBook, String> _saveBookByUrl(String url) async =>
+      _saveBookByUrlUseCase.call(url).inspectErr(_logger.warn);
 
-  FutureResult<NewBook, String> _dowloadBook(String url, BookDownloader downloader) =>
-      _downloadEpubBookByUrl(url, downloader)
-          .inspectErr(_logger.warn)
-          .map((book) => NewBook(title: book.Title, url: url));
+  StreamSubscription<double> _listenToDownloadProgress() =>
+      _saveBookByUrlUseCase.downloadPercentage().listen(_onDownloadProgressUpdate);
 
   void _onDownloadProgressUpdate(double percentage) {
     final RegExp leadingZerosRegex = RegExp(r'\.?0*$');

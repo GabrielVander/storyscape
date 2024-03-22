@@ -1,33 +1,25 @@
+import 'package:equatable/equatable.dart';
 import 'package:isar/isar.dart';
-import 'package:rust_core/result.dart';
-import 'package:storyscape/features/new_book/domain/entities/existing_book.dart';
-import 'package:storyscape/features/new_book/domain/entities/new_book.dart';
 
 part 'local_book_isar_model.g.dart';
 
-@collection
-class LocalBookIsarModel {
-  const LocalBookIsarModel({required this.id, required this.title, required this.url});
+@Collection(inheritance: false)
+class LocalBookIsarModel with EquatableMixin {
+  LocalBookIsarModel({
+    required this.id,
+    required this.url,
+    required this.path,
+    required this.title,
+    required this.author,
+  });
 
   final Id? id;
-  final String? title;
   final String? url;
-}
-
-abstract interface class LocalBookIsarModelMapper {
-  Result<LocalBookIsarModel, String> fromNewBook(NewBook book);
-
-  Result<ExistingBook, String> toExistingBook(LocalBookIsarModel model);
-}
-
-class LocalBookIsarModelMapperImpl implements LocalBookIsarModelMapper {
-  @override
-  Result<LocalBookIsarModel, String> fromNewBook(NewBook book) =>
-      Ok<NewBook, String>(book).map((b) => LocalBookIsarModel(id: null, title: b.title, url: b.url));
+  final String? path;
+  final String? title;
+  final String? author;
 
   @override
-  Result<ExistingBook, String> toExistingBook(LocalBookIsarModel model) {
-    // TODO(GabrielVander): Implement toExistingBook
-    throw UnimplementedError();
-  }
+  @ignore
+  List<Object?> get props => [id, url, path, title, author];
 }
