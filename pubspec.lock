@@ -385,10 +385,10 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: "170c46e237d6eb0e6e9f0e8b3f56101e14fb64f787016e42edd74c39cf8b176a"
+      sha256: "7ecb2f391edbca5473db591b48555a8912dde60edd0fb3013bd6743033b2d3f8"
       url: "https://pub.dev"
     source: hosted
-    version: "13.2.0"
+    version: "13.2.1"
   go_router_builder:
     dependency: "direct dev"
     description:
@@ -761,10 +761,10 @@ packages:
     dependency: "direct main"
     description:
       name: rust_core
-      sha256: "624e0eeeeb930f8d04b64bafc68064d3745ec6cb9149a36cbf89e1b7540305d0"
+      sha256: "3b61f6e32dc8af47dc8fa27b662c5ace9db713fd4dd5e9fd77400e6577d51fb8"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.0"
+    version: "0.5.3"
   scrollable_positioned_list:
     dependency: transitive
     description:
